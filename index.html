@@ -560,7 +560,60 @@
     if (size < 1024) return size + " B";
     else if (size < 1024 * 1024) return (size / 1024).toFixed(1) + " KB";
     else return (size / (1024 * 1024)).toFixed(1) + " MB";
+  function showPage(pageId) {
+  // Try to find the page element
+  const pageEl = document.getElementById(pageId);
+  if (!pageEl) {
+    alert('Error: Tab/Page "' + pageId + '" not found.');
+    return;
   }
+  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+  pageEl.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+  if (pageId !== 'home') {
+    document.getElementById('navigation').style.display = 'block';
+    const navBtn = document.querySelector(`[data-page="${pageId}"]`);
+    if (!navBtn) {
+      alert('Error: Navigation button for "' + pageId + '" not found.');
+      return;
+    }
+    navBtn.classList.add('active');
+  } else {
+    document.getElementById('navigation').style.display = 'none';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    loadDonations(); loadExpenses(); loadMembers(); loadGallery();
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const pageId = this.getAttribute('data-page');
+        if (!pageId) {
+          alert('Error: Navigation button has no linked page.');
+          return;
+        }
+        showPage(pageId);
+      });
+    });
+
+    document.querySelectorAll('.page-card').forEach(card => {
+      card.addEventListener('click', function() {
+        const pageId = this.getAttribute('data-page');
+        if (!pageId) {
+          alert('Error: Card has no linked page.');
+          return;
+        }
+        showPage(pageId);
+      });
+    });
+  } catch (err) {
+    alert('Error on page load: ' + err.message);
+  }
+});
+
 </script>
 </body>
 </html>
