@@ -629,9 +629,13 @@ document.addEventListener('DOMContentLoaded', function() {
   messagingSenderId: "158779015195",
   appId: "1:158779015195:web:46609558e1d09ded8378be"
 };
+  alert("js loaded firebase: welcomev " + firebaseConfig);
+    
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    db.collection("donations").add({demo:789})
+   
+  alert("js loaded firebase: welcomev " + db);
+ db.collection("donations").add({demo:789})
       .then(()=>alert('Firestore write works!'))
       .catch(e=>alert('Firestore error: '+e.message));
   </script>
