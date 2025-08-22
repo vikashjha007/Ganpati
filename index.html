@@ -632,5 +632,15 @@ document.addEventListener('DOMContentLoaded', function() {
             else return (size / (1024 * 1024)).toFixed(1) + " MB";
         }
 </script>
+  <script>
+alert("JS loaded! firebase: " + (typeof firebase));
+try {
+  const db = firebase.firestore();
+  db.collection("donations").add({test:2}).then(()=>alert('ok')).catch(e=>alert('ERR: '+e.message));
+} catch(e) {
+  alert('FATAL: ' + e.message);
+}
+</script>
+
 </body>
 </html>
