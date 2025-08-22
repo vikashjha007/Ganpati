@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Maa Krupa Ganpati Samiti - 2025</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
+<script>
+  const firebaseConfig = {
+  apiKey: "AIzaSyDHCFp2U83R2htaKKz5ZTRAPLahh7lkcXE",
+  authDomain: "ganpati2025-da162.firebaseapp.com",
+  projectId: "ganpati2025-da162",
+  storageBucket: "ganpati2025-da162.firebasestorage.app",
+  messagingSenderId: "198731408007",
+  appId: "1:198731408007:web:a61f4bf5b6fbcb83ae8e22",
+  measurementId: "G-043GNXQ86Q"
+};
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+
     <style>
         /* --- COPY YOUR CSS FROM EARLIER HERE (unchanged) --- */
         * {margin: 0;padding: 0;box-sizing: border-box;}
@@ -299,12 +316,13 @@
             }
         }
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.page-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    const pageId = this.getAttribute('data-page');
-                    showPage(pageId);
-                });
-            });
+  loadDonations();
+  loadExpenses();
+  loadMembers();
+  loadGallery();
+  // ... attach other listeners
+});
+
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const pageId = this.getAttribute('data-page');
@@ -318,30 +336,46 @@
         });
         // Donation Functions
         function addDonation() {
-            const roomNumber = document.getElementById('roomNumber').value;
-            const name = document.getElementById('donorName').value;
-            const paymentMode = document.getElementById('paymentMode').value;
-            const amount = parseFloat(document.getElementById('donationAmount').value);
-            if (roomNumber && name && amount) {
-                const donation = {
-                    id: Date.now(),
-                    roomNumber,
-                    name,
-                    paymentMode,
-                    amount,
-                    date: new Date().toLocaleDateString()
-                };
-                donations.push(donation);
-                renderDonations();
-                clearDonationForm();
-            } else {
-                alert('Please fill all fields');
-            }
-        }
-        function deleteDonation(id) {
-            donations = donations.filter(d => d.id !== id);
-            renderDonations();
-        }
+  const roomNumber = document.getElementById('roomNumber').value;
+  const name = document.getElementById('donorName').value;
+  const paymentMode = document.getElementById('paymentMode').value;
+  const amount = parseFloat(document.getElementById('donationAmount').value);
+
+  if (roomNumber && name && amount) {
+    const donation = {
+      roomNumber,
+      name,
+      paymentMode,
+      amount,
+      date: new Date().toLocaleDateString()
+    };
+    db.collection("donations").add(donation).then(() => {
+      clearDonationForm();
+      loadDonations();
+    });
+  } else {
+    alert('Please fill all fields');
+  }
+}
+
+function loadDonations() {
+  db.collection("donations").get().then((querySnap) => {
+    donations = [];
+    querySnap.forEach((doc) => {
+      let d = doc.data();
+      d.id = doc.id;
+      donations.push(d);
+    });
+    renderDonations();
+  });
+}
+
+function deleteDonation(id) {
+  db.collection("donations").doc(id).delete().then(() => {
+    loadDonations();
+  });
+}
+
         function renderDonations() {
             const tableBody = document.getElementById('donationsTable');
             const totalAmount = donations.reduce((sum, d) => sum + d.amount, 0);
@@ -393,27 +427,43 @@
             }
         }
         function addExpense() {
-            const name = document.getElementById('expenseName').value;
-            const amount = parseFloat(document.getElementById('expenseAmount').value);
-            if (name && amount) {
-                const expense = {
-                    id: Date.now(),
-                    name,
-                    amount,
-                    attachment: expenseAttachment,
-                    date: new Date().toLocaleDateString()
-                };
-                expenses.push(expense);
-                renderExpenses();
-                clearExpenseForm();
-            } else {
-                alert('Please fill expense name and amount');
-            }
-        }
-        function deleteExpense(id) {
-            expenses = expenses.filter(e => e.id !== id);
-            renderExpenses();
-        }
+  const name = document.getElementById('expenseName').value;
+  const amount = parseFloat(document.getElementById('expenseAmount').value);
+  // You can add file uploading to Storage later
+  if (name && amount) {
+    const expense = {
+      name,
+      amount,
+      date: new Date().toLocaleDateString()
+      // attachment: expenseAttachment (see Firebase Storage for files)
+    };
+    db.collection("expenses").add(expense).then(() => {
+      clearExpenseForm();
+      loadExpenses();
+    });
+  } else {
+    alert('Please fill expense name and amount');
+  }
+}
+
+function loadExpenses() {
+  db.collection("expenses").get().then((querySnap) => {
+    expenses = [];
+    querySnap.forEach((doc) => {
+      let e = doc.data();
+      e.id = doc.id;
+      expenses.push(e);
+    });
+    renderExpenses();
+  });
+}
+
+function deleteExpense(id) {
+  db.collection("expenses").doc(id).delete().then(() => {
+    loadExpenses();
+  });
+}
+
         function renderExpenses() {
             const expensesList = document.getElementById('expensesList');
             const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
@@ -485,29 +535,45 @@
             }
         }
         function addMember() {
-            const name = document.getElementById('memberName').value;
-            const role = document.getElementById('memberRole').value;
-            const contact = document.getElementById('memberContact').value;
-            if (name) {
-                const member = {
-                    id: Date.now(),
-                    name,
-                    role,
-                    contact,
-                    photo: memberPhotoData,
-                    date: new Date().toLocaleDateString()
-                };
-                members.push(member);
-                renderMembers();
-                clearMemberForm();
-            } else {
-                alert('Please enter member name');
-            }
-        }
-        function deleteMember(id) {
-            members = members.filter(m => m.id !== id);
-            renderMembers();
-        }
+        function addMember() {
+  const name = document.getElementById('memberName').value;
+  const role = document.getElementById('memberRole').value;
+  const contact = document.getElementById('memberContact').value;
+  if (name) {
+    const member = {
+      name,
+      role,
+      contact,
+      date: new Date().toLocaleDateString()
+      // photo: memberPhotoData, for images use Firebase Storage
+    };
+    db.collection("members").add(member).then(() => {
+      clearMemberForm();
+      loadMembers();
+    });
+  } else {
+    alert('Please enter member name');
+  }
+}
+
+function loadMembers() {
+  db.collection("members").get().then((querySnap) => {
+    members = [];
+    querySnap.forEach((doc) => {
+      let m = doc.data();
+      m.id = doc.id;
+      members.push(m);
+    });
+    renderMembers();
+  });
+}
+
+function deleteMember(id) {
+  db.collection("members").doc(id).delete().then(() => {
+    loadMembers();
+  });
+}
+
         function renderMembers() {
             const membersGrid = document.getElementById('membersGrid');
             const membersEmpty = document.getElementById('membersEmpty');
@@ -552,58 +618,86 @@
         }
         // Gallery Functions
         function handleGalleryImages(input) {
-            const files = Array.from(input.files);
-            let processedCount = 0;
-            if(files.length===0){renderGallery();return;}
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const arrayBuffer = e.target.result;
-                    const bytes = new Uint8Array(arrayBuffer);
-                    const image = {
-                        id: Date.now() + Math.random(),
-                        bytes: Array.from(bytes),
-                        name: file.name,
-                        type: file.type,
-                        size: file.size,
-                        date: new Date().toLocaleDateString()
-                    };
-                    galleryImages.push(image);
-                    processedCount++;
-                    if (processedCount === files.length) {
-                        renderGallery();
-                    }
+    const files = Array.from(input.files);
+    if(files.length===0){ renderGallery(); return; }
+
+    files.forEach(file => {
+        // Create a storage ref with a unique filename
+        const storageRef = firebase.storage().ref("gallery/" + Date.now() + "-" + file.name);
+
+        // Upload file
+        storageRef.put(file).then(snapshot => {
+            // Get download URL for displaying in gallery
+            snapshot.ref.getDownloadURL().then(downloadURL => {
+                // Save metadata and downloadURL to Firestore
+                const image = {
+                    name: file.name,
+                    url: downloadURL,
+                    type: file.type,
+                    size: file.size,
+                    date: new Date().toLocaleDateString()
                 };
-                reader.readAsArrayBuffer(file);
+                db.collection("gallery").add(image).then(() => {
+                    loadGallery();
+                });
             });
-        }
-        function renderGallery() {
-            const imageGrid = document.getElementById('imageGrid');
-            const galleryEmpty = document.getElementById('galleryEmpty');
-            if (galleryImages.length === 0) {
-                imageGrid.innerHTML = '';
-                galleryEmpty.style.display = 'block';
-            } else {
-                imageGrid.innerHTML = galleryImages.map(image => {
-                    const bytes = new Uint8Array(image.bytes);
-                    const blob = new Blob([bytes], {type: image.type});
-                    const url = URL.createObjectURL(blob);
-                    return `
-                        <div class="image-item">
-                            <button class="delete-btn" onclick="deleteGalleryImage(${image.id})">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <img src="${url}" alt="${image.name}" onclick="showModal('${url}', '${image.name}', '${image.date}')" />
-                        </div>
-                    `;
-                }).join('');
-                galleryEmpty.style.display = 'none';
-            }
-        }
+        });
+    });
+}
+
+        function loadGallery() {
+    db.collection("gallery").get().then((querySnap) => {
+        galleryImages = [];
+        querySnap.forEach((doc) => {
+            let img = doc.data();
+            img.id = doc.id;
+            galleryImages.push(img);
+        });
+        renderGallery();
+    });
+}
+
+function renderGallery() {
+    const imageGrid = document.getElementById('imageGrid');
+    const galleryEmpty = document.getElementById('galleryEmpty');
+    if (galleryImages.length === 0) {
+        imageGrid.innerHTML = '';
+        galleryEmpty.style.display = 'block';
+    } else {
+        imageGrid.innerHTML = galleryImages.map(image => {
+            return `
+                <div class="image-item">
+                    <button class="delete-btn" onclick="deleteGalleryImage('${image.id}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <img src="${image.url}" alt="${image.name}" onclick="showModal('${image.url}', '${image.name}', '${image.date}')" />
+                </div>
+            `;
+        }).join('');
+        galleryEmpty.style.display = 'none';
+    }
+}
+
         function deleteGalleryImage(id) {
-            galleryImages = galleryImages.filter(img => img.id !== id);
-            renderGallery();
-        }
+    // First, find the image
+    db.collection("gallery").doc(id).get().then(doc => {
+        let data = doc.data();
+        let url = data.url;
+        let name = data.name;
+        // Remove from Storage (optional)
+        let storageRef = firebase.storage().refFromURL(url); // This works if you use getDownloadURL
+        storageRef.delete().then(() => {
+            // Remove metadata from Firestore
+            db.collection("gallery").doc(id).delete().then(() => {
+                loadGallery();
+            });
+        }).catch(() => {
+            // If storage deletion fails, just remove from Firestore
+            db.collection("gallery").doc(id).delete().then(loadGallery);
+        });
+    });
+}
+
         function showModal(imgSrc, imgName, imgDate) {
             document.getElementById('modalImage').src = imgSrc;
             document.getElementById('modalImageName').textContent = imgName;
