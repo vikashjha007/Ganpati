@@ -4,15 +4,12 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>माँ कृपा गणपति समिति 2025</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
-  <!-- Firebase SDKs -->
+  
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
-</head>
-<body>
   <script>
     alert("js loaded firebase: " + typeof firebase);
     const firebaseConfig = {
@@ -29,7 +26,8 @@
     db.collection("donations").add({demo:789})
       .then(()=>alert('Firestore write works!'))
       .catch(e=>alert('Firestore error: '+e.message));
-  </script>
+  </script> <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <!-- Firebase SDKs -->
   <style>
     * {box-sizing: border-box; margin: 0; padding: 0;}
     body {font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #fff7ed 0%, #fef2f2 100%); min-height: 100vh;}
