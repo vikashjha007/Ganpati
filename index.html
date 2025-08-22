@@ -7,24 +7,7 @@
   
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
-  <script>
-    alert("js loaded firebase: welcome " + typeof firebase);
-    const firebaseConfig = {
-    const firebaseConfig = {
-    apiKey: "AIzaSyDHCFp2U83R2htaKKz5ZTRAPLahh7lkcXE",
-    authDomain: "ganpati2025-da162.firebaseapp.com",
-    projectId: "ganpati2025-da162",
-    storageBucket: "ganpati2025-da162.firebasestorage.app",
-    messagingSenderId: "198731408007",
-    appId: "1:198731408007:web:a61f4bf5b6fbcb83ae8e22",
-    measurementId: "G-043GNXQ86Q"
-  };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    db.collection("donations").add({demo:789})
-      .then(()=>alert('Firestore write works!'))
-      .catch(e=>alert('Firestore error: '+e.message));
-  </script> <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
   <!-- Firebase SDKs -->
   <style>
     * {box-sizing: border-box; margin: 0; padding: 0;}
@@ -635,15 +618,24 @@ document.addEventListener('DOMContentLoaded', function() {
             else return (size / (1024 * 1024)).toFixed(1) + " MB";
         }
 </script>
-  <script>
-alert("JS loaded! firebase: " + (typeof firebase));
-try {
-  const db = firebase.firestore();
-  db.collection("donations").add({test:2}).then(()=>alert('ok')).catch(e=>alert('ERR: '+e.message));
-} catch(e) {
-  alert('FATAL: ' + e.message);
-}
-</script>
+<script>
+    alert("js loaded firebase: welcome " + typeof firebase);
+    const firebaseConfig = {
+    const firebaseConfig = {
+    apiKey: "AIzaSyDHCFp2U83R2htaKKz5ZTRAPLahh7lkcXE",
+    authDomain: "ganpati2025-da162.firebaseapp.com",
+    projectId: "ganpati2025-da162",
+    storageBucket: "ganpati2025-da162.firebasestorage.app",
+    messagingSenderId: "198731408007",
+    appId: "1:198731408007:web:a61f4bf5b6fbcb83ae8e22",
+    measurementId: "G-043GNXQ86Q"
+  };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    db.collection("donations").add({demo:789})
+      .then(()=>alert('Firestore write works!'))
+      .catch(e=>alert('Firestore error: '+e.message));
+  </script>
 
 </body>
 </html>
