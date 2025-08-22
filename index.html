@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>माँ कृपा गणपति समिति 2025</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>माँ कृपा गणपति समिति 2025</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
@@ -23,626 +23,587 @@
       const db = firebase.firestore();
     </script>
     <style>
-        * {margin: 0;padding: 0;box-sizing: border-box;}
-        body {font-family: 'Arial', sans-serif;background: linear-gradient(135deg, #fff7ed 0%, #fef2f2 100%);min-height: 100vh;}
-        .header {background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);color: white;padding: 1rem;box-shadow: 0 4px 6px rgba(0,0,0,0.1);text-align: center;}
-        .header h1 {font-size: 2rem;margin-bottom: 0.5rem;font-weight: bold;}
-        .header p {color: #fed7aa;}
-        .nav-container {background: white;box-shadow: 0 2px 4px rgba(0,0,0,0.1);border-bottom: 1px solid #e5e7eb;}
-        .nav-buttons {max-width: 1200px;margin: 0 auto;padding: 1rem;display: flex;flex-wrap: wrap;gap: 0.5rem;}
-        .nav-btn {display: flex;align-items: center;gap: 0.5rem;padding: 0.75rem 1rem;border: none;border-radius: 0.5rem;font-weight: 500;cursor: pointer;transition: all 0.3s ease;text-decoration: none;}
-        .nav-btn.active {background: #ea580c;color: white;box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
-        .nav-btn:not(.active) {background: #f3f4f6;color: #374151;}
-        .nav-btn:not(.active):hover {background: #fed7aa;color: #ea580c;}
-        .page-container {max-width: 1200px;margin: 0 auto;padding: 2rem 1rem;}
-        .page {display: none;}
-        .page.active {display: block;}
-        .card {background: white;border-radius: 1rem;padding: 2rem;box-shadow: 0 10px 15px rgba(0,0,0,0.1);margin-bottom: 2rem;}
-        .card-header {display: flex;align-items: center;gap: 0.5rem;margin-bottom: 1.5rem;}
-        .card-header h2 {font-size: 1.5rem;font-weight: bold;color: #1f2937;}
-        .welcome-card {text-align: center;margin-bottom: 2rem;}
-        .welcome-icon {font-size: 4rem;margin-bottom: 1rem;}
-        .page-grid {display: grid;grid-template-columns: repeat(auto-fit, minmax(250px,1fr));gap: 1.5rem;margin-top: 2rem;}
-        .page-card {background: linear-gradient(135deg,var(--gradient-from),var(--gradient-to));padding: 2rem;border-radius: 1rem;color: white;cursor: pointer;transform: scale(1);transition: all 0.3s ease;box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
-        .page-card:hover {transform: scale(1.05);box-shadow: 0 10px 15px rgba(0,0,0,0.2);}
-        .page-card i {font-size: 2rem;margin-bottom: 1rem;display: block;}
-        .page-card h3 {font-size: 1.25rem;font-weight: bold;margin-bottom: 0.5rem;}
-        .page-card p {font-size: 0.875rem;opacity: 0.9;}
-        .form-grid {display: grid;grid-template-columns: repeat(auto-fit, minmax(200px,1fr));gap: 1rem;padding: 1rem;background: #f9fafb;border-radius: 0.5rem;margin-bottom: 1.5rem;}
-        .form-group {display: flex;flex-direction: column;gap: 1rem;}
-        .form-input {padding: 0.75rem;border: 1px solid #d1d5db;border-radius: 0.5rem;font-size: 1rem;transition: all 0.3s ease;}
-        .form-input:focus {outline: none;border-color: #ea580c;box-shadow: 0 0 0 3px rgba(234,88,12,0.1);}
-        .file-upload {border: 2px dashed #d1d5db;border-radius: 0.5rem;padding: 2rem;text-align: center;cursor: pointer;transition: all 0.3s ease;}
-        .file-upload:hover {border-color: #ea580c;background: #fef2f2;}
-        .file-upload input {display: none;}
-        .btn {display: flex;align-items: center;justify-content: center;gap: 0.5rem;padding: 0.75rem 1rem;border: none;border-radius: 0.5rem;font-weight: 500;cursor: pointer;transition: all 0.3s ease;text-decoration: none;}
-        .btn-primary {background: linear-gradient(135deg, #10b981 0%, #059669 100%);color: white;}
-        .btn-secondary {background: linear-gradient(135deg,#3b82f6 0%, #1d4ed8 100%);color: white;}
-        .btn-accent {background: linear-gradient(135deg,#8b5cf6 0%, #7c3aed 100%);color: white;}
-        .btn-danger {background: linear-gradient(135deg,#ef4444 0%, #dc2626 100%);color: white;}
-        .btn:hover {box-shadow: 0 4px 6px rgba(0,0,0,0.1);transform: translateY(-1px);}
-        .table-container {overflow-x: auto;margin: 1rem 0;}
-        .data-table {width: 100%;border-collapse: collapse;background: white;border-radius: 0.5rem;overflow: hidden;box-shadow: 0 1px 3px rgba(0,0,0,0.1);}
-        .data-table th {background: #f3f4f6;padding: 1rem;text-align: left;font-weight: 600;color: #374151;}
-        .data-table td {padding: 1rem;border-top: 1px solid #e5e7eb;}
-        .data-table tr:hover {background: #f9fafb;}
-        .badge {display: inline-block;padding: 0.25rem 0.5rem;border-radius: 9999px;font-size: 0.75rem;font-weight: 500;text-transform: uppercase;}
-        .badge-success {background: #d1fae5;color: #065f46;}
-        .badge-info {background: #dbeafe;color: #1e40af;}
-        .total-display {background: linear-gradient(135deg, #10b981 0%, #059669 100%);color: white;padding: 1.5rem;border-radius: 0.5rem;text-align: center;margin-top: 1.5rem;}
-        .total-display h3 {font-size: 1.125rem;margin-bottom: 0.5rem;}
-        .total-display .amount {font-size: 2rem;font-weight: bold;}
-        .member-grid {display: grid;grid-template-columns: repeat(auto-fill, minmax(250px,1fr));gap: 1.5rem;margin-top: 1.5rem;}
-        .member-card {background: white;border: 1px solid #e5e7eb;border-radius: 1rem;padding: 1.5rem;text-align: center;box-shadow: 0 4px 6px rgba(0,0,0,0.1);transition: all 0.3s ease;position: relative;}
-        .member-card:hover {box-shadow: 0 10px 15px rgba(0,0,0,0.1);}
-        .member-photo {width: 80px;height: 80px;border-radius: 50%;object-fit: cover;margin: 0 auto 1rem;border: 4px solid #c084fc;}
-        .member-placeholder {width: 80px;height: 80px;border-radius: 50%;background: #e5e7eb;display: flex;align-items: center;justify-content: center;margin: 0 auto 1rem;font-size: 1.5rem;color: #6b7280;}
-        .delete-btn {position: absolute;top: 0.5rem;right: 0.5rem;background: white;border: none;border-radius: 50%;width: 2rem;height: 2rem;display: flex;align-items: center;justify-content: center;cursor: pointer;box-shadow: 0 2px 4px rgba(0,0,0,0.1);opacity: 0;transition: opacity 0.3s ease;}
-        .member-card:hover .delete-btn {opacity: 1;}
-        .image-grid {display: grid;grid-template-columns: repeat(auto-fill, minmax(200px,1fr));gap: 1rem;margin-top: 1.5rem;}
-        .image-item {position: relative;aspect-ratio: 1;border-radius: 0.5rem;overflow: hidden;box-shadow: 0 4px 6px rgba(0,0,0,0.1);transition: all 0.3s ease;}
-        .image-item:hover {box-shadow: 0 10px 15px rgba(0,0,0,0.1);}
-        .image-item img {width: 100%;height: 100%;object-fit: cover;cursor: pointer;transition: transform 0.3s ease;}
-        .image-item:hover img {transform: scale(1.05);}
-        .image-item .delete-btn {top: 0.5rem;right: 0.5rem;background: rgba(239,68,68,0.9);color: white;}
-        .modal {display: none;position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0,0,0,0.8);z-index: 1000;justify-content: center;align-items: center;padding: 1rem;}
-        .modal.active {display: flex;}
-        .modal-content {position: relative;max-width: 90vw;max-height: 90vh;}
-        .modal img {max-width: 100%;max-height: 100%;object-fit: contain;border-radius: 0.5rem;}
-        .modal-close {position: absolute;top: 1rem;right: 1rem;background: white;border: none;border-radius: 50%;width: 2.5rem;height: 2.5rem;display: flex;align-items: center;justify-content: center;cursor: pointer;font-size: 1.25rem;box-shadow: 0 2px 4px rgba(0,0,0,0.2);}
-        .modal-info {position: absolute;bottom: 1rem;left: 1rem;background: rgba(255,255,255,0.9);padding: 0.5rem;border-radius: 0.5rem;}
-        .empty-state {text-align: center;padding: 3rem;color: #6b7280;}
-        .empty-state i {font-size: 3rem;margin-bottom: 1rem;opacity: 0.5;}
-        @media (max-width: 768px) {.header h1 {font-size: 1.5rem;}.nav-buttons {justify-content: center;}.form-grid {grid-template-columns: 1fr;}.page-grid {grid-template-columns: 1fr;}}
-    </style>
+        /* --- COPY YOUR CSS FROM EARLIER HERE (unchanged) --- */
+        * {margin: 0;padding: 0;box-sizing: border-box;}
+        body {font-family: 'Arial', sans-serif;background: linear-gradient(135deg, #fff7ed 0%, #fef2f2 100%);min-height: 100vh;}
+        .header {background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);color: white;padding: 1rem;box-shadow: 0 4px 6px rgba(0,0,0,0.1);text-align: center;}
+        .header h1 {font-size: 2rem;margin-bottom: 0.5rem;font-weight: bold;}
+        .header p {color: #fed7aa;}
+        .nav-container {background: white;box-shadow: 0 2px 4px rgba(0,0,0,0.1);border-bottom: 1px solid #e5e7eb;}
+        .nav-buttons {max-width: 1200px;margin: 0 auto;padding: 1rem;display: flex;flex-wrap: wrap;gap: 0.5rem;}
+        .nav-btn {display: flex;align-items: center;gap: 0.5rem;padding: 0.75rem 1rem;border: none;border-radius: 0.5rem;font-weight: 500;cursor: pointer;transition: all 0.3s ease;text-decoration: none;}
+        .nav-btn.active {background: #ea580c;color: white;box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
+        .nav-btn:not(.active) {background: #f3f4f6;color: #374151;}
+        .nav-btn:not(.active):hover {background: #fed7aa;color: #ea580c;}
+        .page-container {max-width: 1200px;margin: 0 auto;padding: 2rem 1rem;}
+        .page {display: none;}
+        .page.active {display: block;}
+        .card {background: white;border-radius: 1rem;padding: 2rem;box-shadow: 0 10px 15px rgba(0,0,0,0.1);margin-bottom: 2rem;}
+        .card-header {display: flex;align-items: center;gap: 0.5rem;margin-bottom: 1.5rem;}
+        .card-header h2 {font-size: 1.5rem;font-weight: bold;color: #1f2937;}
+        .welcome-card {text-align: center;margin-bottom: 2rem;}
+        .welcome-icon {font-size: 4rem;margin-bottom: 1rem;}
+        .page-grid {display: grid;grid-template-columns: repeat(auto-fit, minmax(250px,1fr));gap: 1.5rem;margin-top: 2rem;}
+        .page-card {background: linear-gradient(135deg,var(--gradient-from),var(--gradient-to));padding: 2rem;border-radius: 1rem;color: white;cursor: pointer;transform: scale(1);transition: all 0.3s ease;box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
+        .page-card:hover {transform: scale(1.05);box-shadow: 0 10px 15px rgba(0,0,0,0.2);}
+        .page-card i {font-size: 2rem;margin-bottom: 1rem;display: block;}
+        .page-card h3 {font-size: 1.25rem;font-weight: bold;margin-bottom: 0.5rem;}
+        .page-card p {font-size: 0.875rem;opacity: 0.9;}
+        .form-grid {display: grid;grid-template-columns: repeat(auto-fit, minmax(200px,1fr));gap: 1rem;padding: 1rem;background: #f9fafb;border-radius: 0.5rem;margin-bottom: 1.5rem;}
+        .form-group {display: flex;flex-direction: column;gap: 1rem;}
+        .form-input {padding: 0.75rem;border: 1px solid #d1d5db;border-radius: 0.5rem;font-size: 1rem;transition: all 0.3s ease;}
+        .form-input:focus {outline: none;border-color: #ea580c;box-shadow: 0 0 0 3px rgba(234,88,12,0.1);}
+        .file-upload {border: 2px dashed #d1d5db;border-radius: 0.5rem;padding: 2rem;text-align: center;cursor: pointer;transition: all 0.3s ease;}
+        .file-upload:hover {border-color: #ea580c;background: #fef2f2;}
+        .file-upload input {display: none;}
+        .btn {display: flex;align-items: center;justify-content: center;gap: 0.5rem;padding: 0.75rem 1rem;border: none;border-radius: 0.5rem;font-weight: 500;cursor: pointer;transition: all 0.3s ease;text-decoration: none;}
+        .btn-primary {background: linear-gradient(135deg, #10b981 0%, #059669 100%);color: white;}
+        .btn-secondary {background: linear-gradient(135deg,#3b82f6 0%, #1d4ed8 100%);color: white;}
+        .btn-accent {background: linear-gradient(135deg,#8b5cf6 0%, #7c3aed 100%);color: white;}
+        .btn-danger {background: linear-gradient(135deg,#ef4444 0%, #dc2626 100%);color: white;}
+        .btn:hover {box-shadow: 0 4px 6px rgba(0,0,0,0.1);transform: translateY(-1px);}
+        .table-container {overflow-x: auto;margin: 1rem 0;}
+        .data-table {width: 100%;border-collapse: collapse;background: white;border-radius: 0.5rem;overflow: hidden;box-shadow: 0 1px 3px rgba(0,0,0,0.1);}
+        .data-table th {background: #f3f4f6;padding: 1rem;text-align: left;font-weight: 600;color: #374151;}
+        .data-table td {padding: 1rem;border-top: 1px solid #e5e7eb;}
+        .data-table tr:hover {background: #f9fafb;}
+        .badge {display: inline-block;padding: 0.25rem 0.5rem;border-radius: 9999px;font-size: 0.75rem;font-weight: 500;text-transform: uppercase;}
+        .badge-success {background: #d1fae5;color: #065f46;}
+        .badge-info {background: #dbeafe;color: #1e40af;}
+        .total-display {background: linear-gradient(135deg, #10b981 0%, #059669 100%);color: white;padding: 1.5rem;border-radius: 0.5rem;text-align: center;margin-top: 1.5rem;}
+        .total-display h3 {font-size: 1.125rem;margin-bottom: 0.5rem;}
+        .total-display .amount {font-size: 2rem;font-weight: bold;}
+        .member-grid {display: grid;grid-template-columns: repeat(auto-fill, minmax(250px,1fr));gap: 1.5rem;margin-top: 1.5rem;}
+        .member-card {background: white;border: 1px solid #e5e7eb;border-radius: 1rem;padding: 1.5rem;text-align: center;box-shadow: 0 4px 6px rgba(0,0,0,0.1);transition: all 0.3s ease;position: relative;}
+        .member-card:hover {box-shadow: 0 10px 15px rgba(0,0,0,0.1);}
+        .member-photo {width: 80px;height: 80px;border-radius: 50%;object-fit: cover;margin: 0 auto 1rem;border: 4px solid #c084fc;}
+        .member-placeholder {width: 80px;height: 80px;border-radius: 50%;background: #e5e7eb;display: flex;align-items: center;justify-content: center;margin: 0 auto 1rem;font-size: 1.5rem;color: #6b7280;}
+        .delete-btn {position: absolute;top: 0.5rem;right: 0.5rem;background: white;border: none;border-radius: 50%;width: 2rem;height: 2rem;display: flex;align-items: center;justify-content: center;cursor: pointer;box-shadow: 0 2px 4px rgba(0,0,0,0.1);opacity: 0;transition: opacity 0.3s ease;}
+        .member-card:hover .delete-btn {opacity: 1;}
+        .image-grid {display: grid;grid-template-columns: repeat(auto-fill, minmax(200px,1fr));gap: 1rem;margin-top: 1.5rem;}
+        .image-item {position: relative;aspect-ratio: 1;border-radius: 0.5rem;overflow: hidden;box-shadow: 0 4px 6px rgba(0,0,0,0.1);transition: all 0.3s ease;}
+        .image-item:hover {box-shadow: 0 10px 15px rgba(0,0,0,0.1);}
+        .image-item img {width: 100%;height: 100%;object-fit: cover;cursor: pointer;transition: transform 0.3s ease;}
+        .image-item:hover img {transform: scale(1.05);}
+        .image-item .delete-btn {top: 0.5rem;right: 0.5rem;background: rgba(239,68,68,0.9);color: white;}
+        .modal {display: none;position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0,0,0,0.8);z-index: 1000;justify-content: center;align-items: center;padding: 1rem;}
+        .modal.active {display: flex;}
+        .modal-content {position: relative;max-width: 90vw;max-height: 90vh;}
+        .modal img {max-width: 100%;max-height: 100%;object-fit: contain;border-radius: 0.5rem;}
+        .modal-close {position: absolute;top: 1rem;right: 1rem;background: white;border: none;border-radius: 50%;width: 2.5rem;height: 2.5rem;display: flex;align-items: center;justify-content: center;cursor: pointer;font-size: 1.25rem;box-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+        .modal-info {position: absolute;bottom: 1rem;left: 1rem;background: rgba(255,255,255,0.9);padding: 0.5rem;border-radius: 0.5rem;}
+        .empty-state {text-align: center;padding: 3rem;color: #6b7280;}
+        .empty-state i {font-size: 3rem;margin-bottom: 1rem;opacity: 0.5;}
+        @media (max-width: 768px) {.header h1 {font-size: 1.5rem;}.nav-buttons {justify-content: center;}.form-grid {grid-template-columns: 1fr;}.page-grid {grid-template-columns: 1fr;}}
+    </style>
 </head>
-
 <body>
-<!-- Header -->
-<header class="header">
-  <h1>माँ कृपा गणपति समिति 2025</h1>
-  <i class="fas fa-om" style="font-size: 3rem; margin-bottom: 0.5rem;"></i>
-  <p>Ganpati Bappa Morya!</p>
-</header>
-<!-- Navigation -->
-<nav class="nav-container" id="navigation" style="display: none;">
-  <div class="nav-buttons">
-    <button class="nav-btn" data-page="home"><i class="fas fa-home"></i><span>Home</span></button>
-    <button class="nav-btn" data-page="donations"><i class="fas fa-donate"></i><span>Donations</span></button>
-    <button class="nav-btn" data-page="expenses"><i class="fas fa-receipt"></i><span>Expenses</span></button>
-    <button class="nav-btn" data-page="members"><i class="fas fa-users"></i><span>Members</span></button>
-    <button class="nav-btn" data-page="gallery"><i class="fas fa-images"></i><span>Gallery</span></button>
-  </div>
-</nav>
-<!-- Pages -->
-<div class="page-container">
-  <!-- Home Page -->
-  <div id="home" class="page active">
-    <div class="card welcome-card">
-      <i class="fas fa-om" style="font-size: 4rem; color: #ea580c; margin-bottom: 1rem;"></i>
-      <h2 style="font-size: 2rem; margin-bottom: 1rem; color: #1f2937;">Welcome to माँ कृपा गणपति समिति 2025</h2>
-      <p style="font-size: 1.125rem; color: #6b7280; margin-bottom: 2rem;">Manage your Ganpati festival activities with ease</p>
-      <div class="page-grid">
-        <div class="page-card" style="--gradient-from: #10b981; --gradient-to: #059669;" data-page="donations">
-          <i class="fas fa-donate"></i>
-          <h3>Donations</h3>
-          <p>Track all donations received</p>
-        </div>
-        <div class="page-card" style="--gradient-from: #3b82f6; --gradient-to: #1d4ed8;" data-page="expenses">
-          <i class="fas fa-receipt"></i>
-          <h3>Expenses</h3>
-          <p>Manage festival expenses</p>
-        </div>
-        <div class="page-card" style="--gradient-from: #8b5cf6; --gradient-to: #7c3aed;" data-page="members">
-          <i class="fas fa-users"></i>
-          <h3>Members</h3>
-          <p>Member info</p>
-        </div>
-        <div class="page-card" style="--gradient-from: #ea580c; --gradient-to: #dc2626;" data-page="gallery">
-          <i class="fas fa-images"></i>
-          <h3>Gallery</h3>
-          <p>Festival photo gallery</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Donations Page -->
-  <div id="donations" class="page">
-    <div class="card">
-      <div class="card-header">
-        <i class="fas fa-donate" style="color: #10b981; font-size: 1.5rem;"></i>
-        <h2>Donation Management</h2>
-      </div>
-      <div class="form-grid">
-        <input type="text" class="form-input" id="roomNumber" placeholder="Room Number">
-        <input type="text" class="form-input" id="donorName" placeholder="Donor Name">
-        <select class="form-input" id="paymentMode">
-          <option value="cash">Cash</option>
-          <option value="online">Online</option>
-        </select>
-        <input type="number" class="form-input" id="donationAmount" placeholder="Amount (₹)">
-        <button class="btn btn-primary" onclick="addDonation()"><i class="fas fa-plus"></i>Add Donation</button>
-      </div>
-      <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Room No.</th>
-              <th>Name</th>
-              <th>Payment Mode</th>
-              <th>Amount (₹)</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="donationsTable"></tbody>
-        </table>
-      </div>
-      <div class="total-display" id="totalDonations">
-        <h3>Total Donations Received</h3>
-        <div class="amount">₹0</div>
-      </div>
-    </div>
-  </div>
-  <!-- Expenses Page -->
-  <div id="expenses" class="page">
-    <div class="card">
-      <div class="card-header">
-        <i class="fas fa-receipt" style="color: #3b82f6; font-size: 1.5rem;"></i>
-        <h2>Expense Management</h2>
-      </div>
-      <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
-        <div class="form-group">
-          <input type="text" class="form-input" id="expenseName" placeholder="Expense Name">
-          <input type="number" class="form-input" id="expenseAmount" placeholder="Amount (₹)">
-        </div>
-        <div class="form-group">
-          <div class="file-upload" onclick="document.getElementById('expenseFile').click()">
-            <input type="file" id="expenseFile" accept="image/*,application/pdf,.doc,.docx" onchange="handleExpenseFile(this)">
-            <i class="fas fa-upload" style="font-size: 2rem; color: #6b7280; margin-bottom: 0.5rem;"></i>
-            <p id="expenseFileName">Click to upload attachment</p>
-          </div>
-          <button class="btn btn-secondary" onclick="addExpense()"><i class="fas fa-plus"></i>Add Expense</button>
-        </div>
-      </div>
-      <div id="expensesList"></div>
-      <div class="total-display" id="totalExpenses" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
-        <h3>Total Expenses</h3>
-        <div class="amount">₹0</div>
-      </div>
-    </div>
-  </div>
-  <!-- Members Page (role removed) -->
-  <div id="members" class="page">
-    <div class="card">
-      <div class="card-header">
-        <i class="fas fa-users" style="color: #8b5cf6; font-size: 1.5rem;"></i>
-        <h2>Members Management</h2>
-      </div>
-      <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
-        <div class="form-group">
-          <input type="text" class="form-input" id="memberName" placeholder="Member Name">
-          <input type="text" class="form-input" id="memberContact" placeholder="Contact Number">
-        </div>
-        <div class="form-group">
-          <div class="file-upload" onclick="document.getElementById('memberPhoto').click()">
-            <input type="file" id="memberPhoto" accept="image/*" onchange="handleMemberPhoto(this)">
-            <div id="photoPreview">
-              <i class="fas fa-camera" style="font-size: 2rem; color: #6b7280; margin-bottom: 0.5rem;"></i>
-              <p id="photoFileName">Click to upload photo</p>
-            </div>
-          </div>
-          <button class="btn btn-accent" onclick="addMember()"><i class="fas fa-plus"></i>Add Member</button>
-        </div>
-      </div>
-      <div class="member-grid" id="membersGrid"></div>
-      <div id="membersEmpty" class="empty-state">
-        <i class="fas fa-users"></i>
-        <p>No members added yet</p>
-      </div>
-    </div>
-  </div>
-  <!-- Gallery Page -->
-  <div id="gallery" class="page">
-    <div class="card">
-      <div class="card-header">
-        <i class="fas fa-images" style="color: #ea580c; font-size: 1.5rem;"></i>
-        <h2>Image Gallery</h2>
-      </div>
-      <div class="file-upload" style="margin-bottom: 2rem;" onclick="document.getElementById('galleryImages').click()">
-        <input type="file" id="galleryImages" accept="image/*" multiple onchange="handleGalleryImages(this)">
-        <i class="fas fa-camera" style="font-size: 3rem; color: #6b7280; margin-bottom: 1rem;"></i>
-        <h3 style="margin-bottom: 0.5rem; color: #374151;">Upload Festival Photos</h3>
-        <p style="color: #6b7280;">Click to select multiple images</p>
-      </div>
-      <div class="image-grid" id="imageGrid"></div>
-      <div id="galleryEmpty" class="empty-state">
-        <i class="fas fa-images"></i>
-        <p>No images uploaded yet</p>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- Image Modal -->
-<div class="modal" id="imageModal">
-  <div class="modal-content">
-    <img id="modalImage" src="" alt="">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-info" id="modalInfo">
-      <p id="modalImageName"></p>
-      <p id="modalImageDate"></p>
-    </div>
-  </div>
-</div>
-
+    <!-- Header -->
+    <header class="header">
+        <h1>🕉️ Maa Krupa Ganpati Samiti - 2025 🕉️</h1>
+        <p>Ganpati Bappa Morya!</p>
+    </header>
+    <!-- Navigation -->
+    <nav class="nav-container" id="navigation" style="display: none;">
+        <div class="nav-buttons">
+            <button class="nav-btn" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </button>
+            <button class="nav-btn" data-page="donations">
+                <i class="fas fa-donate"></i>
+                <span>Donations</span>
+            </button>
+            <button class="nav-btn" data-page="expenses">
+                <i class="fas fa-receipt"></i>
+                <span>Expenses</span>
+            </button>
+            <button class="nav-btn" data-page="members">
+                <i class="fas fa-users"></i>
+                <span>Members</span>
+            </button>
+            <button class="nav-btn" data-page="gallery">
+                <i class="fas fa-images"></i>
+                <span>Gallery</span>
+            </button>
+        </div>
+    </nav>
+    <!-- Page Container -->
+    <div class="page-container">
+        <div id="home" class="page active">
+            <div class="card welcome-card">
+                <div class="welcome-icon">🐘</div>
+                <h2 style="font-size: 2rem; margin-bottom: 1rem; color: #1f2937;">Welcome to Maa Krupa Ganpati Samiti</h2>
+                <p style="font-size: 1.125rem; color: #6b7280; margin-bottom: 2rem;">Manage your Ganpati festival activities with ease</p>
+                <div class="page-grid">
+                    <div class="page-card" style="--gradient-from: #10b981; --gradient-to: #059669;" data-page="donations">
+                        <i class="fas fa-donate"></i>
+                        <h3>Donations</h3>
+                        <p>Track all donations received</p>
+                    </div>
+                    <div class="page-card" style="--gradient-from: #3b82f6; --gradient-to: #1d4ed8;" data-page="expenses">
+                        <i class="fas fa-receipt"></i>
+                        <h3>Expenses</h3>
+                        <p>Manage festival expenses</p>
+                    </div>
+                    <div class="page-card" style="--gradient-from: #8b5cf6; --gradient-to: #7c3aed;" data-page="members">
+                        <i class="fas fa-users"></i>
+                        <h3>Members</h3>
+                        <p>Committee members info</p>
+                    </div>
+                    <div class="page-card" style="--gradient-from: #ea580c; --gradient-to: #dc2626;" data-page="gallery">
+                        <i class="fas fa-images"></i>
+                        <h3>Gallery</h3>
+                        <p>Festival photo gallery</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Donations Page -->
+        <div id="donations" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-donate" style="color: #10b981; font-size: 1.5rem;"></i>
+                    <h2>Donation Management</h2>
+                </div>
+                <div class="form-grid">
+                    <input type="text" class="form-input" id="roomNumber" placeholder="Room Number">
+                    <input type="text" class="form-input" id="donorName" placeholder="Donor Name">
+                    <select class="form-input" id="paymentMode">
+                        <option value="cash">Cash</option>
+                        <option value="online">Online</option>
+                    </select>
+                    <input type="number" class="form-input" id="donationAmount" placeholder="Amount (₹)">
+                    <button class="btn btn-primary" onclick="addDonation()">
+                        <i class="fas fa-plus"></i>
+                        Add Donation
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Room No.</th>
+                                <th>Name</th>
+                                <th>Payment Mode</th>
+                                <th>Amount (₹)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="donationsTable"></tbody>
+                    </table>
+                </div>
+                <div class="total-display" id="totalDonations">
+                    <h3>Total Donations Received</h3>
+                    <div class="amount">₹0</div>
+                </div>
+            </div>
+        </div>
+        <!-- Expenses Page -->
+        <div id="expenses" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-receipt" style="color: #3b82f6; font-size: 1.5rem;"></i>
+                    <h2>Expense Management</h2>
+                </div>
+                <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="form-group">
+                        <input type="text" class="form-input" id="expenseName" placeholder="Expense Name">
+                        <input type="number" class="form-input" id="expenseAmount" placeholder="Amount (₹)">
+                    </div>
+                    <div class="form-group">
+                        <div class="file-upload" onclick="document.getElementById('expenseFile').click()">
+                            <input type="file" id="expenseFile" accept="image/*,application/pdf,.doc,.docx" onchange="handleExpenseFile(this)">
+                            <i class="fas fa-upload" style="font-size: 2rem; color: #6b7280; margin-bottom: 0.5rem;"></i>
+                            <p id="expenseFileName">Click to upload attachment</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="addExpense()">
+                            <i class="fas fa-plus"></i>
+                            Add Expense
+                        </button>
+                    </div>
+                </div>
+                <div id="expensesList"></div>
+                <div class="total-display" id="totalExpenses" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
+                    <h3>Total Expenses</h3>
+                    <div class="amount">₹0</div>
+                </div>
+            </div>
+        </div>
+        <!-- Members Page -->
+        <div id="members" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-users" style="color: #8b5cf6; font-size: 1.5rem;"></i>
+                    <h2>Members Management</h2>
+                </div>
+                <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="form-group">
+                        <input type="text" class="form-input" id="memberName" placeholder="Member Name">
+                        <input type="text" class="form-input" id="memberRole" placeholder="Role/Position">
+                        <input type="text" class="form-input" id="memberContact" placeholder="Contact Number">
+                    </div>
+                    <div class="form-group">
+                        <div class="file-upload" onclick="document.getElementById('memberPhoto').click()">
+                            <input type="file" id="memberPhoto" accept="image/*" onchange="handleMemberPhoto(this)">
+                            <div id="photoPreview">
+                                <i class="fas fa-camera" style="font-size: 2rem; color: #6b7280; margin-bottom: 0.5rem;"></i>
+                                <p id="photoFileName">Click to upload photo</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-accent" onclick="addMember()">
+                            <i class="fas fa-plus"></i>
+                            Add Member
+                        </button>
+                    </div>
+                </div>
+                <div class="member-grid" id="membersGrid"></div>
+                <div id="membersEmpty" class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <p>No members added yet</p>
+                </div>
+            </div>
+        </div>
+        <!-- Gallery Page -->
+        <div id="gallery" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-images" style="color: #ea580c; font-size: 1.5rem;"></i>
+                    <h2>Image Gallery</h2>
+                </div>
+                <div class="file-upload" style="margin-bottom: 2rem;" onclick="document.getElementById('galleryImages').click()">
+                    <input type="file" id="galleryImages" accept="image/*" multiple onchange="handleGalleryImages(this)">
+                    <i class="fas fa-camera" style="font-size: 3rem; color: #6b7280; margin-bottom: 1rem;"></i>
+                    <h3 style="margin-bottom: 0.5rem; color: #374151;">Upload Festival Photos</h3>
+                    <p style="color: #6b7280;">Click to select multiple images</p>
+                </div>
+                <div class="image-grid" id="imageGrid"></div>
+                <div id="galleryEmpty" class="empty-state">
+                    <i class="fas fa-images"></i>
+                    <p>No images uploaded yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Image Modal -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div class="modal-info" id="modalInfo">
+                <p id="modalImageName"></p>
+                <p id="modalImageDate"></p>
+            </div>
+        </div>
+    </div>
+        
 <script>
-  // Data
-  let donations = [];
-  let expenses = [];
-  let members = [];
-  let galleryImages = [];
-  let expenseAttachmentUrl = null;
-  let memberPhotoUrl = null;
+  // Data
+  let donations = [];
+  let expenses = [];
+  let members = [];
+  let galleryImages = [];
+  let expenseAttachmentUrl = null;
+  let memberPhotoUrl = null;
 
-  // Navigation
-  function showPage(pageId) {
-  const pageEl = document.getElementById(pageId);
-  if (!pageEl) {
-    alert('Error: Tab/Page "' + pageId + '" not found.');
-    return;
-  }
-  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-  pageEl.classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  // Navigation
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    if (pageId !== 'home') {
+      document.getElementById('navigation').style.display = 'block';
+      document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+    } else {
+      document.getElementById('navigation').style.display = 'none';
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    loadDonations(); loadExpenses(); loadMembers(); loadGallery();
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const pageId = this.getAttribute('data-page');
+        showPage(pageId);
+      });
+    });
+    document.querySelectorAll('.page-card').forEach(card => {
+      card.addEventListener('click', function() {
+        const pageId = this.getAttribute('data-page');
+        showPage(pageId);
+      });
+    });
+  });
 
-  if (pageId !== 'home') {
-    document.getElementById('navigation').style.display = 'block';
-    const navBtn = document.querySelector(`[data-page="${pageId}"]`);
-    if (!navBtn) {
-      alert('Error: Navigation button for "' + pageId + '" not found.');
-      return;
-    }
-    navBtn.classList.add('active');
-  } else {
-    document.getElementById('navigation').style.display = 'none';
-  }
-}
+  // Donations Firebase
+  function addDonation() {
+    const roomNumber = document.getElementById('roomNumber').value;
+    const name = document.getElementById('donorName').value;
+    const paymentMode = document.getElementById('paymentMode').value;
+    const amount = parseFloat(document.getElementById('donationAmount').value);
+    if (roomNumber && name && amount) {
+      db.collection("donations").add({
+        roomNumber, name, paymentMode, amount, date: new Date().toLocaleDateString()
+      }).then(() => {
+        clearDonationForm(); loadDonations();
+      });
+    } else alert('Please fill all fields');
+  }
+  function loadDonations() {
+    db.collection("donations").get().then(q => {
+      donations = [];
+      q.forEach(doc => { let d = doc.data(); d.id = doc.id; donations.push(d); });
+      renderDonations();
+    });
+  }
+  function deleteDonation(id) {
+    db.collection("donations").doc(id).delete().then(loadDonations);
+  }
+  function renderDonations() {
+    const tableBody = document.getElementById('donationsTable');
+    const totalAmount = donations.reduce((sum, d) => sum + d.amount, 0);
+    tableBody.innerHTML = donations.map(donation => `
+      <tr>
+        <td>${donation.roomNumber}</td>
+        <td>${donation.name}</td>
+        <td><span class="badge ${donation.paymentMode === 'cash' ? 'badge-success' : 'badge-info'}">${donation.paymentMode.toUpperCase()}</span></td>
+        <td><strong>₹${donation.amount.toLocaleString()}</strong></td>
+        <td><button class="btn btn-danger" style="padding:0.25rem 0.5rem;" onclick="deleteDonation('${donation.id}')"><i class="fas fa-trash"></i></button></td>
+      </tr>
+    `).join('');
+    document.querySelector('#totalDonations .amount').textContent = `₹${totalAmount.toLocaleString()}`;
+  }
+  function clearDonationForm() {
+    document.getElementById('roomNumber').value = '';
+    document.getElementById('donorName').value = '';
+    document.getElementById('paymentMode').value = 'cash';
+    document.getElementById('donationAmount').value = '';
+  }
 
-document.addEventListener('DOMContentLoaded', function() {
-  try {
-    loadDonations();
-    loadExpenses();
-    loadMembers();
-    loadGallery();
+  // Expense attachment file
+  function handleExpenseFile(input) {
+    const file = input.files[0];
+    if (file) {
+      const storageRef = storage.ref("expenses/" + Date.now() + "-" + file.name);
+      storageRef.put(file).then(snapshot => {
+        snapshot.ref.getDownloadURL().then(url => {
+          expenseAttachmentUrl = { url, name: file.name, type: file.type, size: file.size };
+          document.getElementById('expenseFileName').textContent = `Attachment: ${file.name} (${formatFileSize(file.size)})`;
+        });
+      });
+    }
+  }
+  // Expenses Firebase
+  function addExpense() {
+    const name = document.getElementById('expenseName').value;
+    const amount = parseFloat(document.getElementById('expenseAmount').value);
+    if (name && amount) {
+      let expense = { name, amount, date: new Date().toLocaleDateString() };
+      if(expenseAttachmentUrl) expense.attachment = expenseAttachmentUrl;
+      db.collection("expenses").add(expense).then(() => {
+        clearExpenseForm(); loadExpenses();
+      });
+    } else alert('Please fill expense name and amount');
+  }
+  function loadExpenses() {
+    db.collection("expenses").get().then(q => {
+      expenses = [];
+      q.forEach(doc => { let e = doc.data(); e.id = doc.id; expenses.push(e); });
+      renderExpenses();
+    });
+  }
+  function deleteExpense(id) {
+    db.collection("expenses").doc(id).delete().then(loadExpenses);
+  }
+  function renderExpenses() {
+    const expensesList = document.getElementById('expensesList');
+    const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
+    expensesList.innerHTML = expenses.map(expense => `
+      <div style="border:1px solid #e5e7eb; border-radius:0.5rem; padding:1rem; margin-bottom:1rem; background:white;">
+        <div style="display:flex; justify-content:between; align-items:flex-start;">
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.5rem;">
+              <h3 style="font-size:1.125rem; font-weight:600; margin:0;">${expense.name}</h3>
+              <span class="badge badge-info">₹${expense.amount.toLocaleString()}</span>
+              <span style="color:#6b7280;font-size:0.875rem;">${expense.date}</span>
+            </div>
+            ${expense.attachment ? `
+              <div style="display:flex; align-items:center; gap:0.5rem; color:#6b7280;font-size:0.875rem;">
+                <i class="fas fa-paperclip"></i>
+                <span>Attachment: ${expense.attachment.name} (${formatFileSize(expense.attachment.size)})</span>
+                <button onclick="window.open('${expense.attachment.url}','_blank')" style="color:#3b82f6;text-decoration:underline;border:none;background:none;cursor:pointer;">View</button>
+              </div>
+            `:``}
+          </div>
+          <button class="btn btn-danger" style="padding:0.25rem 0.5rem;" onclick="deleteExpense('${expense.id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+    `).join('');
+    document.querySelector('#totalExpenses .amount').textContent = `₹${totalAmount.toLocaleString()}`;
+  }
+  function clearExpenseForm() {
+    document.getElementById('expenseName').value = '';
+    document.getElementById('expenseAmount').value = '';
+    document.getElementById('expenseFileName').textContent = 'Click to upload attachment';
+    document.getElementById('expenseFile').value = '';
+    expenseAttachmentUrl = null;
+  }
 
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const pageId = this.getAttribute('data-page');
-        if (!pageId) {
-          alert('Error: Navigation button has no linked page.');
-          return;
-        }
-        showPage(pageId);
-      });
-    });
-    document.querySelectorAll('.page-card').forEach(card => {
-      card.addEventListener('click', function() {
-        const pageId = this.getAttribute('data-page');
-        if (!pageId) {
-          alert('Error: Card has no linked page.');
-          return;
-        }
-        showPage(pageId);
-      });
-    });
-  } catch (err) {
-    alert('Error on page load: ' + err.message);
-  }
-});
+  // Member Photo upload via Firebase Storage
+  function handleMemberPhoto(input) {
+    const file = input.files[0];
+    if (file) {
+      const storageRef = storage.ref("members/" + Date.now() + "-" + file.name);
+      storageRef.put(file).then(snapshot=>{
+        snapshot.ref.getDownloadURL().then(url=>{
+          memberPhotoUrl = { url, name: file.name, type: file.type, size: file.size };
+          document.getElementById('photoPreview').innerHTML = `
+            <img src="${url}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-bottom: 0.5rem;">
+            <p id="photoFileName">${file.name} (${formatFileSize(file.size)})</p>
+          `;
+        });
+      });
+    }
+  }
+  // Members Firebase
+  function addMember() {
+    const name = document.getElementById('memberName').value;
+    const contact = document.getElementById('memberContact').value;
+    if (name) {
+      let member = { name, contact, date: new Date().toLocaleDateString() };
+      if(memberPhotoUrl) member.photo = memberPhotoUrl;
+      db.collection("members").add(member).then(() => {
+        clearMemberForm(); loadMembers();
+      });
+    } else alert('Please enter member name');
+  }
+  function loadMembers() {
+    db.collection("members").get().then(q => {
+      members = [];
+      q.forEach(doc => { let m = doc.data(); m.id = doc.id; members.push(m); });
+      renderMembers();
+    });
+  }
+  function deleteMember(id) {
+    db.collection("members").doc(id).delete().then(loadMembers);
+  }
+  function renderMembers() {
+    const membersGrid = document.getElementById('membersGrid');
+    const membersEmpty = document.getElementById('membersEmpty');
+    if (members.length === 0) {
+      membersGrid.style.display = 'none';
+      membersEmpty.style.display = 'block';
+    } else {
+      membersGrid.style.display = 'grid';
+      membersEmpty.style.display = 'none';
+      membersGrid.innerHTML = members.map(member => {
+        let photoHtml = `<div class="member-placeholder"><i class="fas fa-user"></i></div>`;
+        if (member.photo && member.photo.url) photoHtml = `<img src="${member.photo.url}" alt="${member.name}" class="member-photo">`;
+        return `
+          <div class="member-card">
+            <button class="delete-btn" onclick="deleteMember('${member.id}')"><i class="fas fa-times" style="color:#ef4444;"></i></button>
+            ${photoHtml}
+            <h3 style="font-size:1.125rem;font-weight:600;color:#1f2937;margin-bottom:0.25rem;">${member.name}</h3>
+            ${member.contact ? `<p style="color:#6b7280;font-size:0.875rem;">${member.contact}</p>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+  }
+  function clearMemberForm() {
+    document.getElementById('memberName').value = '';
+    document.getElementById('memberContact').value = '';
+    document.getElementById('photoPreview').innerHTML = `<i class="fas fa-camera" style="font-size: 2rem; color: #6b7280; margin-bottom: 0.5rem;"></i><p id="photoFileName">Click to upload photo</p>`;
+    document.getElementById('memberPhoto').value = '';
+    memberPhotoUrl = null;
+  }
 
+  // Gallery Firebase Storage + Firestore
+  function handleGalleryImages(input) {
+    const files = Array.from(input.files);
+    if(files.length===0){ renderGallery(); return; }
 
-  // Donations Firebase
-  function addDonation() {
-    const roomNumber = document.getElementById('roomNumber').value;
-    const name = document.getElementById('donorName').value;
-    const paymentMode = document.getElementById('paymentMode').value;
-    const amount = parseFloat(document.getElementById('donationAmount').value);
-    if (roomNumber && name && amount) {
-      db.collection("donations").add({
-        roomNumber, name, paymentMode, amount, date: new Date().toLocaleDateString()
-      }).then(() => {
-        clearDonationForm(); loadDonations();
-      });
-    } else alert('Please fill all fields');
-  }
-  function loadDonations() {
-    db.collection("donations").get().then(q => {
-      donations = [];
-      q.forEach(doc => { let d = doc.data(); d.id = doc.id; donations.push(d); });
-      renderDonations();
-    });
-  }
-  function deleteDonation(id) {
-    db.collection("donations").doc(id).delete().then(loadDonations);
-  }
-  function renderDonations() {
-    const tableBody = document.getElementById('donationsTable');
-    const totalAmount = donations.reduce((sum, d) => sum + d.amount, 0);
-    tableBody.innerHTML = donations.map(donation => `
-      <tr>
-        <td>${donation.roomNumber}</td>
-        <td>${donation.name}</td>
-        <td><span class="badge ${donation.paymentMode === 'cash' ? 'badge-success' : 'badge-info'}">${donation.paymentMode.toUpperCase()}</span></td>
-        <td><strong>₹${donation.amount.toLocaleString()}</strong></td>
-        <td><button class="btn btn-danger" style="padding:0.25rem 0.5rem;" onclick="deleteDonation('${donation.id}')"><i class="fas fa-trash"></i></button></td>
-      </tr>
-    `).join('');
-    document.querySelector('#totalDonations .amount').textContent = `₹${totalAmount.toLocaleString()}`;
-  }
-  function clearDonationForm() {
-    document.getElementById('roomNumber').value = '';
-    document.getElementById('donorName').value = '';
-    document.getElementById('paymentMode').value = 'cash';
-    document.getElementById('donationAmount').value = '';
-  }
-
-  // Expense attachment file
-  function handleExpenseFile(input) {
-    const file = input.files[0];
-    if (file) {
-      const storageRef = storage.ref("expenses/" + Date.now() + "-" + file.name);
-      storageRef.put(file).then(snapshot => {
-        snapshot.ref.getDownloadURL().then(url => {
-          expenseAttachmentUrl = { url, name: file.name, type: file.type, size: file.size };
-          document.getElementById('expenseFileName').textContent = `Attachment: ${file.name} (${formatFileSize(file.size)})`;
-        });
-      });
-    }
-  }
-  // Expenses Firebase
-  function addExpense() {
-    const name = document.getElementById('expenseName').value;
-    const amount = parseFloat(document.getElementById('expenseAmount').value);
-    if (name && amount) {
-      let expense = { name, amount, date: new Date().toLocaleDateString() };
-      if(expenseAttachmentUrl) expense.attachment = expenseAttachmentUrl;
-      db.collection("expenses").add(expense).then(() => {
-        clearExpenseForm(); loadExpenses();
-      });
-    } else alert('Please fill expense name and amount');
-  }
-  function loadExpenses() {
-    db.collection("expenses").get().then(q => {
-      expenses = [];
-      q.forEach(doc => { let e = doc.data(); e.id = doc.id; expenses.push(e); });
-      renderExpenses();
-    });
-  }
-  function deleteExpense(id) {
-    db.collection("expenses").doc(id).delete().then(loadExpenses);
-  }
-  function renderExpenses() {
-    const expensesList = document.getElementById('expensesList');
-    const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
-    expensesList.innerHTML = expenses.map(expense => `
-      <div style="border:1px solid #e5e7eb; border-radius:0.5rem; padding:1rem; margin-bottom:1rem; background:white;">
-        <div style="display:flex; justify-content:between; align-items:flex-start;">
-          <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.5rem;">
-              <h3 style="font-size:1.125rem; font-weight:600; margin:0;">${expense.name}</h3>
-              <span class="badge badge-info">₹${expense.amount.toLocaleString()}</span>
-              <span style="color:#6b7280;font-size:0.875rem;">${expense.date}</span>
-            </div>
-            ${expense.attachment ? `
-              <div style="display:flex; align-items:center; gap:0.5rem; color:#6b7280;font-size:0.875rem;">
-                <i class="fas fa-paperclip"></i>
-                <span>Attachment: ${expense.attachment.name} (${formatFileSize(expense.attachment.size)})</span>
-                <button onclick="window.open('${expense.attachment.url}','_blank')" style="color:#3b82f6;text-decoration:underline;border:none;background:none;cursor:pointer;">View</button>
-              </div>
-            `:``}
-          </div>
-          <button class="btn btn-danger" style="padding:0.25rem 0.5rem;" onclick="deleteExpense('${expense.id}')"><i class="fas fa-trash"></i></button>
-        </div>
-      </div>
-    `).join('');
-    document.querySelector('#totalExpenses .amount').textContent = `₹${totalAmount.toLocaleString()}`;
-  }
-  function clearExpenseForm() {
-    document.getElementById('expenseName').value = '';
-    document.getElementById('expenseAmount').value = '';
-    document.getElementById('expenseFileName').textContent = 'Click to upload attachment';
-    document.getElementById('expenseFile').value = '';
-    expenseAttachmentUrl = null;
-  }
-
-  // Member Photo upload via Firebase Storage
-  function handleMemberPhoto(input) {
-    const file = input.files[0];
-    if (file) {
-      const storageRef = storage.ref("members/" + Date.now() + "-" + file.name);
-      storageRef.put(file).then(snapshot=>{
-        snapshot.ref.getDownloadURL().then(url=>{
-          memberPhotoUrl = { url, name: file.name, type: file.type, size: file.size };
-          document.getElementById('photoPreview').innerHTML = `
-            <img src="${url}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-bottom: 0.5rem;">
-            <p id="photoFileName">${file.name} (${formatFileSize(file.size)})</p>
-          `;
-        });
-      });
-    }
-  }
-  // Members Firebase
-  function addMember() {
-    const name = document.getElementById('memberName').value;
-    const contact = document.getElementById('memberContact').value;
-    if (name) {
-      let member = { name, contact, date: new Date().toLocaleDateString() };
-      if(memberPhotoUrl) member.photo = memberPhotoUrl;
-      db.collection("members").add(member).then(() => {
-        clearMemberForm(); loadMembers();
-      });
-    } else alert('Please enter member name');
-  }
-  function loadMembers() {
-    db.collection("members").get().then(q => {
-      members = [];
-      q.forEach(doc => { let m = doc.data(); m.id = doc.id; members.push(m); });
-      renderMembers();
-    });
-  }
-  function deleteMember(id) {
-    db.collection("members").doc(id).delete().then(loadMembers);
-  }
-  function renderMembers() {
-    const membersGrid = document.getElementById('membersGrid');
-    const membersEmpty = document.getElementById('membersEmpty');
-    if (members.length === 0) {
-      membersGrid.style.display = 'none';
-      membersEmpty.style.display = 'block';
-    } else {
-      membersGrid.style.display = 'grid';
-      membersEmpty.style.display = 'none';
-      membersGrid.innerHTML = members.map(member => {
-        let photoHtml = `<div class="member-placeholder"><i class="fas fa-user"></i></div>`;
-        if (member.photo && member.photo.url) photoHtml = `<img src="${member.photo.url}" alt="${member.name}" class="member-photo">`;
-        return `
-          <div class="member-card">
-            <button class="delete-btn" onclick="deleteMember('${member.id}')"><i class="fas fa-times" style="color:#ef4444;"></i></button>
-            ${photoHtml}
-            <h3 style="font-size:1.125rem;font-weight:600;color:#1f2937;margin-bottom:0.25rem;">${member.name}</h3>
-            ${member.contact ? `<p style="color:#6b7280;font-size:0.875rem;">${member.contact}</p>` : ''}
-          </div>
-        `;
-      }).join('');
-    }
-  }
-  function clearMemberForm() {
-    document.getElementById('memberName').value = '';
-    document.getElementById('memberContact').value = '';
-    document.getElementById('photoPreview').innerHTML = `<i class="fas fa-camera" style="font-size: 2rem; color: #6b7280; margin-bottom: 0.5rem;"></i><p id="photoFileName">Click to upload photo</p>`;
-    document.getElementById('memberPhoto').value = '';
-    memberPhotoUrl = null;
-  }
-
-  // Gallery Firebase Storage + Firestore
-  function handleGalleryImages(input) {
-    const files = Array.from(input.files);
-    if(files.length===0){ renderGallery(); return; }
-
-    files.forEach(file => {
-      const storageRef = storage.ref("gallery/" + Date.now() + "-" + file.name);
-      storageRef.put(file).then(snapshot => {
-        snapshot.ref.getDownloadURL().then(url => {
-          db.collection("gallery").add({
-            name: file.name, url, type: file.type, size: file.size,
-            date: new Date().toLocaleDateString()
-          }).then(loadGallery);
-        });
-      });
-    });
-  }
-  function loadGallery() {
-    db.collection("gallery").get().then(q => {
-      galleryImages = [];
-      q.forEach(doc => { let img = doc.data(); img.id = doc.id; galleryImages.push(img); });
-      renderGallery();
-    });
-  }
-  function renderGallery() {
-    const imageGrid = document.getElementById('imageGrid');
-    const galleryEmpty = document.getElementById('galleryEmpty');
-    if (galleryImages.length === 0) {
-      imageGrid.innerHTML = '';
-      galleryEmpty.style.display = 'block';
-    } else {
-      imageGrid.innerHTML = galleryImages.map(image => `
-        <div class="image-item">
-          <button class="delete-btn" onclick="deleteGalleryImage('${image.id}')"><i class="fas fa-times"></i></button>
-          <img src="${image.url}" alt="${image.name}" onclick="showModal('${image.url}', '${image.name}', '${image.date}')" />
-        </div>
-      `).join('');
-      galleryEmpty.style.display = 'none';
-    }
-  }
-  function deleteGalleryImage(id) {
-    db.collection("gallery").doc(id).get().then(doc => {
-      let data = doc.data();
-      let url = data.url;
-      let storageRef = storage.refFromURL(url);
-      storageRef.delete().then(() => {
-        db.collection("gallery").doc(id).delete().then(loadGallery);
-      }).catch(() => {
-        db.collection("gallery").doc(id).delete().then(loadGallery);
-      });
-    });
-  }
-  function showModal(imgSrc, imgName, imgDate) {
-    document.getElementById('modalImage').src = imgSrc;
-    document.getElementById('modalImageName').textContent = imgName;
-    document.getElementById('modalImageDate').textContent = imgDate;
-    document.getElementById('imageModal').classList.add('active');
-  }
-  function closeModal() {
-    document.getElementById('imageModal').classList.remove('active');
-    document.getElementById('modalImage').src = '';
-  }
-  function formatFileSize(size) {
-    if (size < 1024) return size + " B";
-    else if (size < 1024 * 1024) return (size / 1024).toFixed(1) + " KB";
-    else return (size / (1024 * 1024)).toFixed(1) + " MB";
-  function showPage(pageId) {
-  // Try to find the page element
-  const pageEl = document.getElementById(pageId);
-  if (!pageEl) {
-    alert('Error: Tab/Page "' + pageId + '" not found.');
-    return;
-  }
-  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-  pageEl.classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-
-  if (pageId !== 'home') {
-    document.getElementById('navigation').style.display = 'block';
-    const navBtn = document.querySelector(`[data-page="${pageId}"]`);
-    if (!navBtn) {
-      alert('Error: Navigation button for "' + pageId + '" not found.');
-      return;
-    }
-    navBtn.classList.add('active');
-  } else {
-    document.getElementById('navigation').style.display = 'none';
-  }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  try {
-    loadDonations(); loadExpenses(); loadMembers(); loadGallery();
-
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const pageId = this.getAttribute('data-page');
-        if (!pageId) {
-          alert('Error: Navigation button has no linked page.');
-          return;
-        }
-        showPage(pageId);
-      });
-    });
-
-    document.querySelectorAll('.page-card').forEach(card => {
-      card.addEventListener('click', function() {
-        const pageId = this.getAttribute('data-page');
-        if (!pageId) {
-          alert('Error: Card has no linked page.');
-          return;
-        }
-        showPage(pageId);
-      });
-    });
-  } catch (err) {
-    alert('Error on page load: ' + err.message);
-  }
-});
-
+    files.forEach(file => {
+      const storageRef = storage.ref("gallery/" + Date.now() + "-" + file.name);
+      storageRef.put(file).then(snapshot => {
+        snapshot.ref.getDownloadURL().then(url => {
+          db.collection("gallery").add({
+            name: file.name, url, type: file.type, size: file.size,
+            date: new Date().toLocaleDateString()
+          }).then(loadGallery);
+        });
+      });
+    });
+  }
+  function loadGallery() {
+    db.collection("gallery").get().then(q => {
+      galleryImages = [];
+      q.forEach(doc => { let img = doc.data(); img.id = doc.id; galleryImages.push(img); });
+      renderGallery();
+    });
+  }
+  function renderGallery() {
+    const imageGrid = document.getElementById('imageGrid');
+    const galleryEmpty = document.getElementById('galleryEmpty');
+    if (galleryImages.length === 0) {
+      imageGrid.innerHTML = '';
+      galleryEmpty.style.display = 'block';
+    } else {
+      imageGrid.innerHTML = galleryImages.map(image => `
+        <div class="image-item">
+          <button class="delete-btn" onclick="deleteGalleryImage('${image.id}')"><i class="fas fa-times"></i></button>
+          <img src="${image.url}" alt="${image.name}" onclick="showModal('${image.url}', '${image.name}', '${image.date}')" />
+        </div>
+      `).join('');
+      galleryEmpty.style.display = 'none';
+    }
+  }
+  function deleteGalleryImage(id) {
+    db.collection("gallery").doc(id).get().then(doc => {
+      let data = doc.data();
+      let url = data.url;
+      let storageRef = storage.refFromURL(url);
+      storageRef.delete().then(() => {
+        db.collection("gallery").doc(id).delete().then(loadGallery);
+      }).catch(() => {
+        db.collection("gallery").doc(id).delete().then(loadGallery);
+      });
+    });
+  }
+  function showModal(imgSrc, imgName, imgDate) {
+    document.getElementById('modalImage').src = imgSrc;
+    document.getElementById('modalImageName').textContent = imgName;
+    document.getElementById('modalImageDate').textContent = imgDate;
+    document.getElementById('imageModal').classList.add('active');
+  }
+  function closeModal() {
+    document.getElementById('imageModal').classList.remove('active');
+    document.getElementById('modalImage').src = '';
+  }
+  function formatFileSize(size) {
+    if (size < 1024) return size + " B";
+    else if (size < 1024 * 1024) return (size / 1024).toFixed(1) + " KB";
+    else return (size / (1024 * 1024)).toFixed(1) + " MB";
+  }
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
