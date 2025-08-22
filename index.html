@@ -347,6 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('inside success');
         clearDonationForm(); loadDonations();
       });
+      db.collection("donations").add({test: 1}).then(()=>alert('success')).catch(e=>alert(e.message));
     } else alert('Please fill all fields for donation.');
   }
   function loadDonations() {
