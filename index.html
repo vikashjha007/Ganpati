@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const pageId = this.getAttribute('data-page');
-      alert('Nav Tab Clicked: ' + pageId);
+      
       if (!pageId) {
         alert('Error: Navigation button has no linked page.');
         return;
@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.page-card').forEach(card => {
     card.addEventListener('click', function() {
       const pageId = this.getAttribute('data-page');
-      alert('Home Card Clicked: ' + pageId);
+      
       if (!pageId) {
         alert('Error: Card has no linked page.');
         return;
