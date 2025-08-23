@@ -466,6 +466,7 @@ alert("storage "+storageRef+" upload task "+uploadTask);
       alert('फ़ाइल अपलोड में त्रुटि: ' + error.message);
     }, () => {
       uploadTask.snapshot.ref.getDownloadURL().then(url => {
+        alert('फ़ाइल अपलोड होगा: ');
         saveExpense(name, amount, url, expenseAttachmentFile.name);
       });
     });
