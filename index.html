@@ -585,61 +585,68 @@ function clearExpenseForm() {
     expenseAttachment = null;
 }
   
-  function handleGalleryImages(input) {
+   // Make sure Firebase Storage SDK is included and initialized
+
+
+// Handles multiple image uploads from file input
+function handleGalleryImages(input) {
   const files = Array.from(input.files);
   if (files.length === 0) {
+    alert("No files selected for upload.");
     renderGallery();
     return;
   }
 
-  const uploadPromises = [];
-  const storageRef = firebase.storage().ref();
+  alert(`${files.length} file(s) selected for upload.`);
+
+  let uploadedCount = 0;
+  const totalFiles = files.length;
 
   files.forEach(file => {
-    const uniqueName = 'gallery/images/' + Date.now() + '_' + file.name;
-    const fileRef = storageRef.child(uniqueName);
+    alert(`Starting upload for: ${file.name}`);
 
-    // Upload file to Storage
+    const uniquePath = 'gallery/images/' + Date.now() + '_' + file.name;
+    const fileRef = storage.ref(uniquePath);
+
     const uploadTask = fileRef.put(file);
 
-    uploadPromises.push(new Promise((resolve, reject) => {
-      uploadTask.on('state_changed',
-        null,
-        error => {
-          alert(`Upload failed: ${file.name} - ${error.message}`);
-          reject(error);
-        },
-        () => {
-          // Upload complete, get download URL
-          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-            // Save file info in Firestore
-            db.collection('gallery').add({
-              url: downloadURL,
-              name: file.name,
-              type: file.type,
-              size: file.size,
-              date: new Date().toLocaleDateString()
-            }).then(() => {
-              alert(`Image uploaded successfully: ${file.name}`);
-              resolve();
-            }).catch(error => {
-              alert(`Firestore save failed: ${error.message}`);
-              reject(error);
-            });
-          });
-        }
-      );
-    }));
-  });
+    uploadTask.on('state_changed',
+      snapshot => {
+        // Optional: can show progress here if needed
+      },
+      error => {
+        alert(`Upload failed for ${file.name}: ${error.message}`);
+      },
+      () => {
+        uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+          alert(`Upload successful for ${file.name}. Saving metadata in Firestore...`);
 
-  // Wait for all uploads to finish before reloading gallery
-  Promise.all(uploadPromises).then(() => {
-    loadGallery();
-  }).catch(() => {
-    console.error("One or more uploads failed.");
+          db.collection('gallery').add({
+            url: downloadURL,
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            date: new Date().toLocaleDateString()
+          }).then(() => {
+            alert(`Metadata saved in Firestore for ${file.name}`);
+
+            uploadedCount++;
+            if (uploadedCount === totalFiles) {
+              alert('All files uploaded and saved successfully.');
+              loadGallery();
+            }
+          }).catch(error => {
+            alert(`Error saving metadata for ${file.name}: ${error.message}`);
+          });
+        }).catch(error => {
+          alert(`Failed to get download URL for ${file.name}: ${error.message}`);
+        });
+      }
+    );
   });
 }
 
+// Loads gallery images from Firestore and renders them
 function loadGallery() {
   db.collection('gallery').get().then(querySnapshot => {
     const galleryImages = [];
@@ -649,9 +656,12 @@ function loadGallery() {
       galleryImages.push(data);
     });
     renderGallery(galleryImages);
+  }).catch(error => {
+    alert('Error loading gallery: ' + error.message);
   });
 }
 
+// Renders gallery images in the UI
 function renderGallery(galleryImages) {
   const imageGrid = document.getElementById('imageGrid');
   const galleryEmpty = document.getElementById('galleryEmpty');
@@ -662,11 +672,33 @@ function renderGallery(galleryImages) {
     imageGrid.innerHTML = galleryImages.map(img => `
       <div class="image-item">
         <button class="delete-btn" onclick="deleteGalleryImage('${img.id}')"><i class="fas fa-times"></i></button>
-        <img src="${img.url}" alt="${img.name}" onclick="showModal('${img.url}', '${img.name}', '${img.date}')"/>
+        <img src="${img.url}" alt="${img.name}" onclick="showModal('${img.url}', '${img.name}', '${img.date}')" />
       </div>
     `).join('');
     galleryEmpty.style.display = 'none';
   }
+}
+
+// Delete image document and (optional) storage file
+function deleteGalleryImage(id) {
+  db.collection('gallery').doc(id).get().then(doc => {
+    if (!doc.exists) {
+      alert('Image not found!');
+      return;
+    }
+    const image = doc.data();
+
+    // Delete file from Firebase Storage (optional: requires you saved storage path)
+    // We'll skip here to avoid complexity, but ideally you delete Storage file as well.
+
+    // Delete Firestore document
+    db.collection('gallery').doc(id).delete().then(() => {
+      alert('Image deleted successfully.');
+      loadGallery();
+    }).catch(error => {
+      alert('Error deleting image: ' + error.message);
+    });
+  });
 }
 
 
@@ -692,7 +724,7 @@ function renderGallery(galleryImages) {
 
   const storage = firebase.storage();
 
-   
+   alert("storage verification",storage):
   
  
   </script>
