@@ -620,7 +620,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 </script>
 <script>
-    alert("js loaded firebase: welcome " + typeof firebase);
+    alert("js loaded firebase:  " + typeof firebase);
     
  const firebaseConfig = {
   apiKey: "AIzaSyDHCFp2U83R2htaKKz5ZTRAPLahh7lkcXE",
@@ -633,16 +633,12 @@ document.addEventListener('DOMContentLoaded', function() {
   measurementId: "G-043GNXQ86Q"
 };
 
-   alert("js loaded firebase: welcome 2 " + typeof firebase);
-  alert("js loaded firebase: welcomev " + firebaseConfig);
-    
+   
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
    
-  alert("js loaded firebase: welcomev " + db);
- db.collection("donations").add({demo:789})
-      .then(()=>alert('Firestore write works!'))
-      .catch(e=>alert('Firestore error: '+e.message));
+  
+ 
   </script>
 
 </body>
