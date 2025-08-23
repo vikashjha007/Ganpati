@@ -146,8 +146,8 @@
     <a href="mailto:vikashjha9137@gmail.com" style="color: #bfdbfe; text-decoration: none;">vikashjha9137@gmail.com</a>
   </p>
 </div>
-      </div>     
-     
+
+      </div>
     </div>
   </div>
 
@@ -646,7 +646,7 @@ function handleGalleryImages(input) {
   });
 }
 
-// Loads gallery images from Firestore and renders them
+
 function loadGallery() {
   db.collection('gallery').get().then(querySnapshot => {
     const galleryImages = [];
@@ -679,7 +679,7 @@ function renderGallery(galleryImages) {
   }
 }
 
-// Delete image document and (optional) storage file
+
 function deleteGalleryImage(id) {
   db.collection('gallery').doc(id).get().then(doc => {
     if (!doc.exists) {
@@ -688,10 +688,7 @@ function deleteGalleryImage(id) {
     }
     const image = doc.data();
 
-    // Delete file from Firebase Storage (optional: requires you saved storage path)
-    // We'll skip here to avoid complexity, but ideally you delete Storage file as well.
-
-    // Delete Firestore document
+   
     db.collection('gallery').doc(id).delete().then(() => {
       alert('Image deleted successfully.');
       loadGallery();
