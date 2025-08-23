@@ -584,108 +584,91 @@ function clearExpenseForm() {
     document.getElementById('expenseFile').value = '';
     expenseAttachment = null;
 }
+  gallery").doc(id).get().then(doc => {
   function handleGalleryImages(input) {
-    const files = Array.from(input.files);
-    if (files.length === 0) { 
-        renderGallery(); 
-        return;
-    }
-    let uploadedCount = 0;
-    files.forEach(file => {
-        const filePath = 'gallery/images/' + Date.now() + '_' + file.name;
-        const storageRef = firebase.storage().ref(filePath);
-        const uploadTask = storageRef.put(file);
+  const files = Array.from(input.files);
+  if (files.length === 0) {
+    renderGallery();
+    return;
+  }
 
-        alert('Uploading: ' + file.name);
+  const uploadPromises = [];
+  const storageRef = firebase.storage().ref();
 
-        uploadTask.on('state_changed', null, 
-            function(error) { // on error
-                alert('Image upload failed: ' + file.name + ' / ' + error.message);
-            },
-            function() { // on success
-                uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
-                    db.collection('gallery').add({
-                        url: downloadURL,
-                        name: file.name,
-                        type: file.type,
-                        size: file.size,
-                        date: new Date().toLocaleDateString()
-                    }).then(() => {
-                        alert('Image uploaded: ' + file.name);
-                        uploadedCount++;
-                        if (uploadedCount === files.length) {
-                            loadGallery();
-                        }
-                    }).catch(e => {
-                        alert('Firestore error: ' + e.message);
-                    });
-                });
-            }
-        );
-    });
+  files.forEach(file => {
+    const uniqueName = 'gallery/images/' + Date.now() + '_' + file.name;
+    const fileRef = storageRef.child(uniqueName);
+
+    // Upload file to Storage
+    const uploadTask = fileRef.put(file);
+
+    uploadPromises.push(new Promise((resolve, reject) => {
+      uploadTask.on('state_changed',
+        null,
+        error => {
+          alert(`Upload failed: ${file.name} - ${error.message}`);
+          reject(error);
+        },
+        () => {
+          // Upload complete, get download URL
+          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+            // Save file info in Firestore
+            db.collection('gallery').add({
+              url: downloadURL,
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              date: new Date().toLocaleDateString()
+            }).then(() => {
+              alert(`Image uploaded successfully: ${file.name}`);
+              resolve();
+            }).catch(error => {
+              alert(`Firestore save failed: ${error.message}`);
+              reject(error);
+            });
+          });
+        }
+      );
+    }));
+  });
+
+  // Wait for all uploads to finish before reloading gallery
+  Promise.all(uploadPromises).then(() => {
+    loadGallery();
+  }).catch(() => {
+    console.error("One or more uploads failed.");
+  });
 }
 
-// Loads gallery from Firestore, displays thumbnails
 function loadGallery() {
-    db.collection("gallery").get().then(q => {
-        const galleryImages = [];
-        q.forEach(doc => {
-            let d = doc.data();
-            d.id = doc.id;
-            galleryImages.push(d);
-        });
-        renderGallery(galleryImages);
+  db.collection('gallery').get().then(querySnapshot => {
+    const galleryImages = [];
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      data.id = doc.id;
+      galleryImages.push(data);
     });
+    renderGallery(galleryImages);
+  });
 }
 
 function renderGallery(galleryImages) {
-    const imageGrid = document.getElementById('imageGrid');
-    const galleryEmpty = document.getElementById('galleryEmpty');
-    if (galleryImages.length === 0) {
-        imageGrid.innerHTML = '';
-        galleryEmpty.style.display = 'block';
-    } else {
-        imageGrid.innerHTML = galleryImages.map(image => `
-            <div class="image-item">
-                <button class="delete-btn" onclick="deleteGalleryImage('${image.id}')">
-                    <i class="fas fa-times"></i>
-                </button>
-                <img src="${image.url}" alt="${image.name}" onclick="showModal('${image.url}', '${image.name}', '${image.date}')" />
-            </div>
-        `).join('');
-        galleryEmpty.style.display = 'none';
-    }
+  const imageGrid = document.getElementById('imageGrid');
+  const galleryEmpty = document.getElementById('galleryEmpty');
+  if (!galleryImages.length) {
+    imageGrid.innerHTML = '';
+    galleryEmpty.style.display = 'block';
+  } else {
+    imageGrid.innerHTML = galleryImages.map(img => `
+      <div class="image-item">
+        <button class="delete-btn" onclick="deleteGalleryImage('${img.id}')"><i class="fas fa-times"></i></button>
+        <img src="${img.url}" alt="${img.name}" onclick="showModal('${img.url}', '${img.name}', '${img.date}')"/>
+      </div>
+    `).join('');
+    galleryEmpty.style.display = 'none';
+  }
 }
 
-// Delete from Firestore and remove image from Storage
-function deleteGalleryImage(id) {
-    db.collection("gallery").doc(id).get().then(doc => {
-        if(!doc.exists) return;
-        const image = doc.data();
-        if(image && image.url) {
-            // Extract Storage path from url (reverse engineering, if possible)
-            // Otherwise, best to save storagePath when you upload!
-            // Storage ref deletion example (if you stored path):
-            // firebase.storage().ref(image.storagePath).delete();
-        }
-        db.collection("gallery").doc(id).delete().then(() => {
-            alert('Image deleted');
-            loadGallery();
-        });
-    });
-}
-
-// Modal display stays the same
-function showModal(imgSrc, imgName, imgDate) {
-    document.getElementById('modalImage').src = imgSrc;
-    document.getElementById('modalImageName').textContent = imgName;
-    document.getElementById('modalImageDate').textContent = imgDate;
-    document.getElementById('imageModal').classList.add('active');
-}
-function closeModal() {
-    document.getElementById('imageModal').classList.remove('active');
-    document.getElementById('modalImage').src = '';
-}
 
 
 </script>
