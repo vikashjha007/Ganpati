@@ -336,7 +336,24 @@ document.addEventListener('DOMContentLoaded', function() {
     else return (size / (1024 * 1024)).toFixed(1) + " MB";
   }
 /* The rest of your CRUD/DB code here */ // Donation Functions
-        
+   function fetchVisibilityFlag() {
+  const docId = "HideShow"; // replace with your actual doc id
+  db.collection("HideShowFlag").doc(docId).get()
+    .then(doc => {
+      if(doc.exists) {
+        const flag = doc.data().flag;
+        applyVisibility(flag);
+      } else {
+        console.warn("No flag document found");
+        applyVisibility(true); // default to visible if not found
+      }
+    })
+    .catch(error => {
+      console.error("Error fetching flag:", error);
+      applyVisibility(true);
+    });
+}
+     
   function addDonation() {
     
     const roomNumber = document.getElementById('roomNumber').value;
