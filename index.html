@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
     else return (size / (1024 * 1024)).toFixed(1) + " MB";
   }
 /* The rest of your CRUD/DB code here */ // Donation Functions
-        let donations = [];
+        
   function addDonation() {
     
     const roomNumber = document.getElementById('roomNumber').value;
@@ -327,8 +327,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const paymentMode = document.getElementById('paymentMode').value;
     const amount = parseFloat(document.getElementById('donationAmount').value);
     if (roomNumber && name && amount) {
-      alert('inside ऐड');db.collection("donations").add({test: 1}).then(()=>alert('success')).catch(e=>alert(e.message));
-    } else alert('Please fill all fields for donation.');
+      alert('inside ऐड');
+      db.collection("donations").add({demo:789})
+        
   
       db.collection("donations").add({
         roomNumber, name, paymentMode, amount, date: new Date().toLocaleDateString()
@@ -336,6 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('inside success');
         clearDonationForm(); loadDonations();
       });
+      } else alert('Please fill all fields for donation.');
   }  
   function loadDonations() {
     db.collection("donations").get().then(q => {
