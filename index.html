@@ -369,255 +369,154 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
         // Expense Functions
-        function handleExpenseFile(input) {
-            const file = input.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const arrayBuffer = e.target.result;
-                    const bytes = new Uint8Array(arrayBuffer);
-                    expenseAttachment = {
-                        bytes: Array.from(bytes),
-                        dataUrl: null,
-                        name: file.name,
-                        type: file.type,
-                        size: file.size
-                    };
-                    const blob = new Blob([bytes], { type: file.type });
-                    expenseAttachment.dataUrl = URL.createObjectURL(blob);
-                    document.getElementById('expenseFileName').textContent = `Attachment: ${file.name} (${formatFileSize(file.size)})`;
-                };
-                reader.readAsArrayBuffer(file);
-            }
-        }
-        function addExpense() {
-            const name = document.getElementById('expenseName').value;
-            const amount = parseFloat(document.getElementById('expenseAmount').value);
-            if (name && amount) {
-                const expense = {
-                    id: Date.now(),
-                    name,
-                    amount,
-                    attachment: expenseAttachment,
-                    date: new Date().toLocaleDateString()
-                };
-                expenses.push(expense);
-                renderExpenses();
-                clearExpenseForm();
-            } else {
-                alert('Please fill expense name and amount');
-            }
-        }
-        function deleteExpense(id) {
-            expenses = expenses.filter(e => e.id !== id);
-            renderExpenses();
-        }
-        function renderExpenses() {
-            const expensesList = document.getElementById('expensesList');
-            const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
-            expensesList.innerHTML = expenses.map(expense => `
-                <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; background: white;">
-                    <div style="display: flex; justify-content: between; align-items: flex-start;">
-                        <div style="flex: 1;">
-                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-                                <h3 style="font-size: 1.125rem; font-weight: 600; margin: 0;">${expense.name}</h3>
-                                <span class="badge badge-info">₹${expense.amount.toLocaleString()}</span>
-                                <span style="color: #6b7280; font-size: 0.875rem;">${expense.date}</span>
-                            </div>
-                            ${expense.attachment ? `
-                                <div style="display: flex; align-items: center; gap: 0.5rem; color: #6b7280; font-size: 0.875rem;">
-                                    <i class="fas fa-paperclip"></i>
-                                    <span>Attachment: ${expense.attachment.name} (${formatFileSize(expense.attachment.size)}) - ${expense.attachment.bytes.length} bytes</span>
-                                    <button onclick="viewAttachment(${expense.id})" style="color: #3b82f6; text-decoration: underline; border: none; background: none; cursor: pointer;">View</button>
-                                </div>
-                            ` : ''}
-                        </div>
-                        <button class="btn btn-danger" style="padding: 0.25rem 0.5rem;" onclick="deleteExpense(${expense.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-            document.querySelector('#totalExpenses .amount').textContent = `₹${totalAmount.toLocaleString()}`;
-        }
-        function viewAttachment(expenseId) {
-            const expense = expenses.find(e => e.id === expenseId);
-            if (expense && expense.attachment) {
-                const bytes = new Uint8Array(expense.attachment.bytes);
-                const blob = new Blob([bytes], { type: expense.attachment.type });
-                const url = URL.createObjectURL(blob);
-                window.open(url, '_blank');
-                setTimeout(() => URL.revokeObjectURL(url), 1000);
-            }
-        }
-        function clearExpenseForm() {
-            document.getElementById('expenseName').value = '';
-            document.getElementById('expenseAmount').value = '';
-            document.getElementById('expenseFileName').textContent = 'Click to upload attachment';
-            document.getElementById('expenseFile').value = '';
-            expenseAttachment = null;
-        }
-        // Member Functions
-        function handleMemberPhoto(input) {
-            const file = input.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const arrayBuffer = e.target.result;
-                    const bytes = new Uint8Array(arrayBuffer);
-                    memberPhotoData = {
-                        bytes: Array.from(bytes),
-                        name: file.name,
-                        type: file.type,
-                        size: file.size
-                    };
-                    const blob = new Blob([bytes], { type: file.type });
-                    const dataUrl = URL.createObjectURL(blob);
-                    document.getElementById('photoPreview').innerHTML = `
-                        <img src="${dataUrl}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-bottom: 0.5rem;">
-                        <p id="photoFileName">${file.name} (${formatFileSize(file.size)}) - ${bytes.length} bytes</p>
-                    `;
-                    setTimeout(() => URL.revokeObjectURL(dataUrl), 1000);
-                };
-                reader.readAsArrayBuffer(file);
-            }
-        }
-        function addMember() {
-            const name = document.getElementById('memberName').value;
-            const role = document.getElementById('memberRole').value;
-            const contact = document.getElementById('memberContact').value;
-            if (name) {
-                const member = {
-                    id: Date.now(),
-                    name,
-                    role,
-                    contact,
-                    photo: memberPhotoData,
-                    date: new Date().toLocaleDateString()
-                };
-                members.push(member);
-                renderMembers();
-                clearMemberForm();
-            } else {
-                alert('Please enter member name');
-            }
-        }
-        function deleteMember(id) {
-            members = members.filter(m => m.id !== id);
-            renderMembers();
-        }
-        function renderMembers() {
-            const membersGrid = document.getElementById('membersGrid');
-            const membersEmpty = document.getElementById('membersEmpty');
-            if (members.length === 0) {
-                membersGrid.style.display = 'none';
-                membersEmpty.style.display = 'block';
-            } else {
-                membersGrid.style.display = 'grid';
-                membersEmpty.style.display = 'none';
-                membersGrid.innerHTML = members.map(member => {
-                    let photoHtml = '';
-                    if (member.photo) {
-                        const bytes = new Uint8Array(member.photo.bytes);
-                        const blob = new Blob([bytes], { type: member.photo.type });
-                        const url = URL.createObjectURL(blob);
-                        photoHtml = `<img src="${url}" alt="${member.name}" class="member-photo" onload="setTimeout(() => URL.revokeObjectURL('${url}'), 100)">`;
-                    } else {
-                        photoHtml = `<div class="member-placeholder"><i class="fas fa-user"></i></div>`;
-                    }
-                    return `
-                        <div class="member-card">
-                            <button class="delete-btn" onclick="deleteMember(${member.id})">
-                                <i class="fas fa-times" style="color: #ef4444;"></i>
-                            </button>
-                            ${photoHtml}
-                            <h3 style="font-size: 1.125rem; font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">${member.name}</h3>
-                            ${member.role ? `<p style="color: #8b5cf6; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.25rem;">${member.role}</p>` : ''}
-                            ${member.contact ? `<p style="color: #6b7280; font-size: 0.875rem;">${member.contact}</p>` : ''}
-                            ${member.photo ? `<p style="color: #9ca3af; font-size: 0.75rem; margin-top: 0.5rem;">${member.photo.bytes.length} bytes</p>` : ''}
-                        </div>
-                    `;
-                }).join('');
-            }
-        }
-        function clearMemberForm() {
-            document.getElementById('memberName').value = '';
-            document.getElementById('memberRole').value = '';
-            document.getElementById('memberContact').value = '';
-            document.getElementById('photoPreview').innerHTML = `<i class="fas fa-camera" style="font-size: 2rem; color: #6b7280; margin-bottom: 0.5rem;"></i><p id="photoFileName">Click to upload photo</p>`;
-            document.getElementById('memberPhoto').value = '';
-            memberPhotoData = null;
-        }
-        // Gallery Functions
-        function handleGalleryImages(input) {
-            const files = Array.from(input.files);
-            let processedCount = 0;
-            if(files.length===0){renderGallery();return;}
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const arrayBuffer = e.target.result;
-                    const bytes = new Uint8Array(arrayBuffer);
-                    const image = {
-                        id: Date.now() + Math.random(),
-                        bytes: Array.from(bytes),
-                        name: file.name,
-                        type: file.type,
-                        size: file.size,
-                        date: new Date().toLocaleDateString()
-                    };
-                    galleryImages.push(image);
-                    processedCount++;
-                    if (processedCount === files.length) {
-                        renderGallery();
-                    }
-                };
-                reader.readAsArrayBuffer(file);
-            });
-        }
-        function renderGallery() {
-            const imageGrid = document.getElementById('imageGrid');
-            const galleryEmpty = document.getElementById('galleryEmpty');
-            if (galleryImages.length === 0) {
-                imageGrid.innerHTML = '';
-                galleryEmpty.style.display = 'block';
-            } else {
-                imageGrid.innerHTML = galleryImages.map(image => {
-                    const bytes = new Uint8Array(image.bytes);
-                    const blob = new Blob([bytes], {type: image.type});
-                    const url = URL.createObjectURL(blob);
-                    return `
-                        <div class="image-item">
-                            <button class="delete-btn" onclick="deleteGalleryImage(${image.id})">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <img src="${url}" alt="${image.name}" onclick="showModal('${url}', '${image.name}', '${image.date}')" />
-                        </div>
-                    `;
-                }).join('');
-                galleryEmpty.style.display = 'none';
-            }
-        }
-        function deleteGalleryImage(id) {
-            galleryImages = galleryImages.filter(img => img.id !== id);
-            renderGallery();
-        }
-        function showModal(imgSrc, imgName, imgDate) {
-            document.getElementById('modalImage').src = imgSrc;
-            document.getElementById('modalImageName').textContent = imgName;
-            document.getElementById('modalImageDate').textContent = imgDate;
-            document.getElementById('imageModal').classList.add('active');
-        }
-        function closeModal() {
-            document.getElementById('imageModal').classList.remove('active');
-            document.getElementById('modalImage').src = '';
-        }
-        // Utility
-        function formatFileSize(size) {
-            if (size < 1024) return size + " B";
-            else if (size < 1024 * 1024) return (size / 1024).toFixed(1) + " KB";
-            else return (size / (1024 * 1024)).toFixed(1) + " MB";
+   // Declare db globally (already done): const db = firebase.firestore();
+
+// Expense upload code (attachment as base64 for Firestore safety)
+let expenseAttachment = null;
+
+function handleExpenseFile(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const arrayBuffer = e.target.result;
+            const bytes = new Uint8Array(arrayBuffer);
+            // Convert bytes to Base64 string (safer for Firestore)
+            const base64 = btoa(String.fromCharCode(...bytes));
+            expenseAttachment = {
+                base64: base64,
+                name: file.name,
+                type: file.type,
+                size: file.size
+            };
+            document.getElementById('expenseFileName').textContent =
+                `Attachment: ${file.name} (${formatFileSize(file.size)})`;
+        };
+        reader.readAsArrayBuffer(file);
+    }
+}
+
+function addExpense() {
+    const name = document.getElementById('expenseName').value;
+    const amount = parseFloat(document.getElementById('expenseAmount').value);
+    alert('Adding expense...');
+    if (name && amount) {
+        let expenseData = {
+            name,
+            amount,
+            date: new Date().toLocaleDateString(),
+            attachment: expenseAttachment ? {
+                base64: expenseAttachment.base64,
+                name: expenseAttachment.name,
+                type: expenseAttachment.type,
+                size: expenseAttachment.size
+            } : null
+        };
+        db.collection("expenses")
+            .add(expenseData)
+            .then(() => {
+                alert('Expense added successfully!');
+                clearExpenseForm();
+                loadExpenses();
+            })
+            .catch(e => alert('Expense add error: ' + e.message));
+    } else {
+        alert('Please fill expense name and amount');
+    }
+}
+
+// Load all expenses from Firestore
+function loadExpenses() {
+    db.collection("expenses").get().then(q => {
+        const expenses = [];
+        q.forEach(doc => {
+            let d = doc.data();
+            d.id = doc.id;
+            expenses.push(d);
+        });
+        renderExpenses(expenses);
+    });
+}
+
+// Render function gets expenses array from Firestore
+function renderExpenses(expenses) {
+    const expensesList = document.getElementById('expensesList');
+    const totalAmount = expenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+    expensesList.innerHTML = expenses.map(expense => `
+       <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; background: white;">
+            <div style="display: flex; justify-content: between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; margin: 0;">${expense.name}</h3>
+                        <span class="badge badge-info">₹${(expense.amount || 0).toLocaleString()}</span>
+                        <span style="color: #6b7280; font-size: 0.875rem;">${expense.date}</span>
+                    </div>
+                    ${expense.attachment ? `
+                        <div style="display: flex; align-items: center; gap: 0.5rem; color: #6b7280; font-size: 0.875rem;">
+                            <i class="fas fa-paperclip"></i>
+                            <span>Attachment: ${expense.attachment.name} (${formatFileSize(expense.attachment.size)})</span>
+                            <button onclick="viewAttachment('${expense.id}')" style="color: #3b82f6; text-decoration: underline; border: none; background: none; cursor: pointer;">View</button>
+                        </div>
+                    ` : ''}
+                </div>
+                <button class="btn btn-danger" style="padding: 0.25rem 0.5rem;" onclick="deleteExpense('${expense.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+       </div>
+    `).join('');
+    document.querySelector('#totalExpenses .amount').textContent = `₹${totalAmount.toLocaleString()}`;
+}
+
+// Delete expense from Firestore
+function deleteExpense(id) {
+    alert('Deleting expense...');
+    db.collection("expenses").doc(id).delete()
+        .then(() => {
+            alert('Expense deleted successfully!');
+            loadExpenses();
+        })
+        .catch(e => alert('Expense delete error: ' + e.message));
+}
+
+// Utility for attachment viewing (base64)
+function viewAttachment(expenseId) {
+    db.collection("expenses").doc(expenseId).get().then(doc => {
+        let expense = doc.data();
+        if (expense && expense.attachment && expense.attachment.base64) {
+            let blob = b64toBlob(expense.attachment.base64, expense.attachment.type);
+            let url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        } else {
+            alert("No attachment found");
         }
+    });
+}
+
+// Helper
+function b64toBlob(b64Data, contentType='application/octet-stream') {
+    const byteCharacters = atob(b64Data);
+    const byteArrays = [];
+    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+        const slice = byteCharacters.slice(offset, offset + 512);
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++)
+            byteNumbers[i] = slice.charCodeAt(i);
+        byteArrays.push(new Uint8Array(byteNumbers));
+    }
+    return new Blob(byteArrays, { type: contentType });
+}
+
+// Reset expense form as before
+function clearExpenseForm() {
+    document.getElementById('expenseName').value = '';
+    document.getElementById('expenseAmount').value = '';
+    document.getElementById('expenseFileName').textContent = 'Click to upload attachment';
+    document.getElementById('expenseFile').value = '';
+    expenseAttachment = null;
+}
+
 </script>
 <script>
     alert("js loaded firebase:  " + typeof firebase);
