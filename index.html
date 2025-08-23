@@ -440,57 +440,60 @@ document.addEventListener('DOMContentLoaded', function() {
    // Declare db globally (already done): const db = firebase.firestore();
 
 // Expense upload code (attachment as base64 for Firestore safety)
-let expenseAttachment = null;
+let expenseAttachmentFile = null;
 
 function handleExpenseFile(input) {
-    const file = input.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const arrayBuffer = e.target.result;
-            const bytes = new Uint8Array(arrayBuffer);
-            // Convert bytes to Base64 string (safer for Firestore)
-            const base64 = btoa(String.fromCharCode(...bytes));
-            expenseAttachment = {
-                base64: base64,
-                name: file.name,
-                type: file.type,
-                size: file.size
-            };
-            document.getElementById('expenseFileName').textContent =
-                `Attachment: ${file.name} (${formatFileSize(file.size)})`;
-        };
-        reader.readAsArrayBuffer(file);
-    }
+  expenseAttachmentFile = input.files[0];
+  if (expenseAttachmentFile) {
+    document.getElementById('expenseFileName').textContent = `${expenseAttachmentFile.name} (${formatFileSize(expenseAttachmentFile.size)})`;
+  }
 }
 
 function addExpense() {
-    const name = document.getElementById('expenseName').value;
-    const amount = parseFloat(document.getElementById('expenseAmount').value);
-    alert('Adding expense...');
-    if (name && amount) {
-        let expenseData = {
-            name,
-            amount,
-            date: new Date().toLocaleDateString(),
-            attachment: expenseAttachment ? {
-                base64: expenseAttachment.base64,
-                name: expenseAttachment.name,
-                type: expenseAttachment.type,
-                size: expenseAttachment.size
-            } : null
-        };
-        db.collection("expenses")
-            .add(expenseData)
-            .then(() => {
-                alert('Expense added successfully!');
-                clearExpenseForm();
-                loadExpenses();
-            })
-            .catch(e => alert('Expense add error: ' + e.message));
-    } else {
-        alert('Please fill expense name and amount');
-    }
+  const name = document.getElementById('expenseName').value.trim();
+  const amount = parseFloat(document.getElementById('expenseAmount').value);
+
+  if (!name || !amount) {
+    alert('कृपया व्यय का नाम और राशि भरें।');
+    return;
+  }
+
+  if (expenseAttachmentFile) {
+    const storageRef = firebase.storage().ref('expenses/attachments/' + Date.now() + '_' + expenseAttachmentFile.name);
+    const uploadTask = storageRef.put(expenseAttachmentFile);
+
+    uploadTask.on('state_changed', null, error => {
+      alert('फ़ाइल अपलोड में त्रुटि: ' + error.message);
+    }, () => {
+      uploadTask.snapshot.ref.getDownloadURL().then(url => {
+        saveExpense(name, amount, url, expenseAttachmentFile.name);
+      });
+    });
+  } else {
+    saveExpense(name, amount, null, null);
+  }
+}
+
+function saveExpense(name, amount, attachmentURL, attachmentName) {
+  db.collection('expenses').add({
+    name,
+    amount,
+    date: new Date().toLocaleDateString(),
+    attachmentURL: attachmentURL || null,
+    attachmentName: attachmentName || null
+  }).then(() => {
+    alert('व्यय सफलतापूर्वक जोड़ा गया!');
+    clearExpenseForm();
+    loadExpenses();
+  }).catch(e => alert('व्यय जोड़ने में त्रुटि: ' + e.message));
+}
+
+function clearExpenseForm() {
+  document.getElementById('expenseName').value = '';
+  document.getElementById('expenseAmount').value = '';
+  document.getElementById('expenseFileName').textContent = 'क्लिक कर संलग्नक अपलोड करें';
+  document.getElementById('expenseFile').value = '';
+  expenseAttachmentFile = null;
 }
 
 // Load all expenses from Firestore
@@ -547,34 +550,8 @@ function deleteExpense(id) {
         .catch(e => alert('Expense delete error: ' + e.message));
 }
 
-// Utility for attachment viewing (base64)
-function viewAttachment(expenseId) {
-    db.collection("expenses").doc(expenseId).get().then(doc => {
-        let expense = doc.data();
-        if (expense && expense.attachment && expense.attachment.base64) {
-            let blob = b64toBlob(expense.attachment.base64, expense.attachment.type);
-            let url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-        } else {
-            alert("No attachment found");
-        }
-    });
-}
 
-// Helper
-function b64toBlob(b64Data, contentType='application/octet-stream') {
-    const byteCharacters = atob(b64Data);
-    const byteArrays = [];
-    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-        const slice = byteCharacters.slice(offset, offset + 512);
-        const byteNumbers = new Array(slice.length);
-        for (let i = 0; i < slice.length; i++)
-            byteNumbers[i] = slice.charCodeAt(i);
-        byteArrays.push(new Uint8Array(byteNumbers));
-    }
-    return new Blob(byteArrays, { type: contentType });
-}
+
 
 // Reset expense form as before
 function clearExpenseForm() {
