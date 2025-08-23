@@ -458,7 +458,7 @@ function addExpense() {
     return;
   }
 
-  if (expenseAttachmentFile) 
+  if (expenseAttachmentFile) {
     const storageRef = firebase.storage().ref('expenses/attachments/' + Date.now() + '_' + expenseAttachmentFile.name);
     const uploadTask = storageRef.put(expenseAttachmentFile);
 alert("storage "+storageRef+" upload task "+uploadTask);
