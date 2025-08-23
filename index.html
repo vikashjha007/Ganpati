@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(doc => {
       if(doc.exists) {
         
-        alert("document found");
+        
         const flag = doc.data().Flag;
         
         alert("document found" + flag);
@@ -369,6 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
   function applyVisibility(flag) {
   const displayStyle = flag ? 'inline-block' : 'none';
+    alert("document display " + displayStyle);
 
   // Donations
   document.querySelectorAll('#add-donation').forEach(el => el.style.display = displayStyle);
