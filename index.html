@@ -194,12 +194,12 @@
         </div>
         <!-- Expenses Page -->
         <div id="expenses" class="page">
-            <div class="card" id="add-expense">
+            <div class="card" >
                 <div class="card-header">
                     <i class="fas fa-receipt" style="color: #3b82f6; font-size: 1.5rem;"></i>
                     <h2>Expense Management</h2>
                 </div>
-                <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="form-grid" id="add-expense"  style="grid-template-columns: 1fr 1fr;">
                     <div class="form-group">
                         <input type="text" class="form-input" id="expenseName" placeholder="Expense Name">
                         <input type="number" class="form-input" id="expenseAmount" placeholder="Amount (₹)">
@@ -226,11 +226,11 @@
         <!-- Members Page -->
         <div id="members" class="page">
             <div class="card">
-                <div class="card-header" id="add-member">
+                <div class="card-header" >
                     <i class="fas fa-users" style="color: #8b5cf6; font-size: 1.5rem;"></i>
                     <h2>Members Management</h2>
                 </div>
-                <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="form-grid" id="add-member" style="grid-template-columns: 1fr 1fr;">
                     <div class="form-group">
                         <input type="text" class="form-input" id="memberName" placeholder="Member Name">
                       
@@ -527,7 +527,7 @@ function renderExpenses(expenses) {
                         </div>
                     ` : ''}
                 </div>
-                <button class="btn btn-danger btn-delete-expense " style="padding: 0.25rem 0.5rem;" onclick="deleteExpense('${expense.id}')">
+                <button class="btn btn-danger btn-delete-expense" style="padding: 0.25rem 0.5rem;" onclick="deleteExpense('${expense.id}')">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
