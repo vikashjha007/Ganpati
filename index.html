@@ -435,6 +435,62 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('paymentMode').value = 'cash';
     document.getElementById('donationAmount').value = '';
   }
+function addMember() {
+  const name = document.getElementById('memberName').value;
+  const contact = document.getElementById('memberContact').value;
+  const fileInput = document.getElementById('memberPhoto');
+  const file = fileInput.files[0];
+
+  if (!name) {
+    alert('Please enter member name');
+    return;
+  }
+
+  if (file) {
+    alert('Uploading member photo...');
+    const uniquePath = 'members/photos/' + Date.now() + '_' + file.name;
+    const storageRef = firebase.storage().ref(uniquePath);
+    const uploadTask = storageRef.put(file);
+
+    uploadTask.on('state_changed', 
+      null,
+      error => {
+        alert('Photo upload failed: ' + error.message);
+      },
+      () => {
+        uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+          alert('Photo uploaded successfully, saving member data...');
+          db.collection('members').add({
+            name,
+            contact,
+            photoUrl: downloadURL,
+            date: new Date().toLocaleDateString()
+          }).then(() => {
+            alert('Member added successfully!');
+            clearMemberForm();
+            loadMembers();
+          }).catch(error => {
+            alert('Error saving member: ' + error.message);
+          });
+        });
+      }
+    );
+  } else {
+    // Add member without photo
+    db.collection('members').add({
+      name,
+      contact,
+      photoUrl: null,
+      date: new Date().toLocaleDateString()
+    }).then(() => {
+      alert('Member added without photo!');
+      clearMemberForm();
+      loadMembers();
+    }).catch(error => {
+      alert('Error saving member: ' + error.message);
+    });
+  }
+}
 
         // Expense Functions
    // Declare db globally (already done): const db = firebase.firestore();
