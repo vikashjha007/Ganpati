@@ -458,10 +458,10 @@ function addExpense() {
     return;
   }
 
-  if (expenseAttachmentFile) {
+  if (expenseAttachmentFile) 
     const storageRef = firebase.storage().ref('expenses/attachments/' + Date.now() + '_' + expenseAttachmentFile.name);
     const uploadTask = storageRef.put(expenseAttachmentFile);
-
+alert("storage "+storageRef+" upload task "+uploadTask);
     uploadTask.on('state_changed', null, error => {
       alert('फ़ाइल अपलोड में त्रुटि: ' + error.message);
     }, () => {
@@ -475,6 +475,7 @@ function addExpense() {
 }
 
 function saveExpense(name, amount, attachmentURL, attachmentName) {
+ alert("save expence");
   db.collection('expenses').add({
     name,
     amount,
@@ -650,8 +651,6 @@ function renderGallery(galleryImages) {
 
 </script>
 <script>
-    alert("js loaded firebase:  " + typeof firebase);
-    
  const firebaseConfig = {
   apiKey: "AIzaSyDHCFp2U83R2htaKKz5ZTRAPLahh7lkcXE",
   authDomain: "ganpati2025-da162.firebaseapp.com",
@@ -668,7 +667,7 @@ function renderGallery(galleryImages) {
     const db = firebase.firestore();
 
   const storage = firebase.storage();
-alert("storage =" + storage);
+
    
   
  
