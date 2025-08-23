@@ -335,6 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('navigation').style.display = (pageId !== 'home') ? 'block' : 'none';
     });
   });
+  fetchVisibilityFlag();
   loadDonations();
     loadExpenses();
     loadMembers();
@@ -371,15 +372,15 @@ document.addEventListener('DOMContentLoaded', function() {
   const displayStyle = flag ? 'inline-block' : 'none';
 
   // Donations
-  document.querySelectorAll('.add-donation').forEach(el => el.style.display = displayStyle);
+  document.querySelectorAll('#add-donation').forEach(el => el.style.display = displayStyle);
   document.querySelectorAll('.btn-delete-donation').forEach(el => el.style.display = displayStyle);
 
   // Members
-  document.querySelectorAll('.add-member').forEach(el => el.style.display = displayStyle);
+  document.querySelectorAll('#add-member').forEach(el => el.style.display = displayStyle);
   document.querySelectorAll('.btn-delete-member').forEach(el => el.style.display = displayStyle);
 
   // Expenses
-  document.querySelectorAll('.add-expense').forEach(el => el.style.display = displayStyle);
+  document.querySelectorAll('#add-expense').forEach(el => el.style.display = displayStyle);
   document.querySelectorAll('.btn-delete-expense').forEach(el => el.style.display = displayStyle);
 
   // Upload Images
@@ -423,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <td>${donation.name}</td>
         <td><span class="badge ${donation.paymentMode === 'cash' ? 'badge-success' : 'badge-info'}">${donation.paymentMode.toUpperCase()}</span></td>
         <td><strong>₹${donation.amount.toLocaleString()}</strong></td>
-        <td><button class="btn btn-danger" style="padding:0.25rem 0.5rem;" onclick="deleteDonation('${donation.id}')"><i class="fas fa-trash"></i></button></td>
+        <td><button class="btn btn-danger btn-delete-donation" style="padding:0.25rem 0.5rem;" onclick="deleteDonation('${donation.id}')"><i class="fas fa-trash"></i></button></td>
       </tr>
     `).join('');
     document.querySelector('#totalDonations .amount').textContent = `₹${totalAmount.toLocaleString()}`;
@@ -526,7 +527,7 @@ function renderExpenses(expenses) {
                         </div>
                     ` : ''}
                 </div>
-                <button class="btn btn-danger" style="padding: 0.25rem 0.5rem;" onclick="deleteExpense('${expense.id}')">
+                <button class="btn btn-danger btn-delete-expense " style="padding: 0.25rem 0.5rem;" onclick="deleteExpense('${expense.id}')">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
