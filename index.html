@@ -194,7 +194,7 @@
         </div>
         <!-- Expenses Page -->
         <div id="expenses" class="page">
-            <div class="card">
+            <div class="card" id="add-expense">
                 <div class="card-header">
                     <i class="fas fa-receipt" style="color: #3b82f6; font-size: 1.5rem;"></i>
                     <h2>Expense Management</h2>
@@ -226,7 +226,7 @@
         <!-- Members Page -->
         <div id="members" class="page">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header" id="add-member">
                     <i class="fas fa-users" style="color: #8b5cf6; font-size: 1.5rem;"></i>
                     <h2>Members Management</h2>
                 </div>
@@ -367,6 +367,25 @@ document.addEventListener('DOMContentLoaded', function() {
       applyVisibility(true);
     });
 }
+  function applyVisibility(flag) {
+  const displayStyle = flag ? 'inline-block' : 'none';
+
+  // Donations
+  document.querySelectorAll('.add-donation').forEach(el => el.style.display = displayStyle);
+  document.querySelectorAll('.btn-delete-donation').forEach(el => el.style.display = displayStyle);
+
+  // Members
+  document.querySelectorAll('.add-member').forEach(el => el.style.display = displayStyle);
+  document.querySelectorAll('.btn-delete-member').forEach(el => el.style.display = displayStyle);
+
+  // Expenses
+  document.querySelectorAll('.add-expense').forEach(el => el.style.display = displayStyle);
+  document.querySelectorAll('.btn-delete-expense').forEach(el => el.style.display = displayStyle);
+
+  // Upload Images
+  document.querySelectorAll('.btn-upload-image').forEach(el => el.style.display = displayStyle);
+}
+
      
   function addDonation() {
     
