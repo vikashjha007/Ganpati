@@ -138,21 +138,18 @@
           <i class="fas fa-images"></i>
           <h3>Gallery</h3><p>Festival photo gallery</p>
         </div>
-      </div>
-    </div>
-  </div>
-  <div style="max-width: 300px; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; text-align: center; font-family: Arial, sans-serif;">
-  <!-- Developer Icon Logo -->
-  <i class="fas fa-user-circle" style="font-size: 100px; color: #4f46e5; margin-bottom: 1rem;"></i>
-
-  <!-- Developer Name -->
-  <h2 style="margin: 0; font-size: 1.5rem; color: #1f2937;">Vikash Jha</h2>
+        <div class="page-card" style="--gradient-from: #ea680c; --gradient-to: #dc2626;" data-page="developer info">
+          <i class="fas fa-user-circle"></i>
+          <h3>Developer Info</h3><h2 style="margin: 0; font-size: 1.5rem; color: #1f2937;">Vikash Jha</h2>
 
   <!-- Developer Email -->
   <p style="font-size: 1rem; color: #4b5563; margin-top: 0.5rem;">
     <a href="mailto:vikashjha9137@gmail.com" style="color: #4f46e5; text-decoration: none;">vikashjha9137@gmail.com</a>
   </p>
-</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Add your Donations, Expenses, Members, Gallery pages here, as before -->
   <!-- ... -->
@@ -162,7 +159,7 @@
                     <i class="fas fa-donate" style="color: #10b981; font-size: 1.5rem;"></i>
                     <h2>Donation Management</h2>
                 </div>
-                <div class="form-grid">
+                <div class="form-grid" id="add-donation">
                     <input type="text" class="form-input" id="roomNumber" placeholder="Room Number">
                     <input type="text" class="form-input" id="donorName" placeholder="Donor Name">
                     <select class="form-input" id="paymentMode">
@@ -354,7 +351,11 @@ document.addEventListener('DOMContentLoaded', function() {
   db.collection("HideShowFlag").doc(docId).get()
     .then(doc => {
       if(doc.exists) {
+        
+        alert("document found");
         const flag = doc.data().flag;
+        
+        alert("No flag document found", flag);
         applyVisibility(flag);
       } else {
         alert("No flag document found");
