@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
         alert("document found");
         const flag = doc.data().flag;
         
-        alert("No flag document found", flag);
+        alert("document found" + flag);
         applyVisibility(flag);
       } else {
         alert("No flag document found");
@@ -690,7 +690,7 @@ function renderGallery(galleryImages) {
     const db = firebase.firestore();
 
   const storage = firebase.storage();
-
+alert("storage =" + storage);
    
   
  
