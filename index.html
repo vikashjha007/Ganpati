@@ -513,55 +513,175 @@ function loadExpenses() {
 
 // Render function gets expenses array from Firestore
 function renderExpenses(expenses) {
-    const expensesList = document.getElementById('expensesList');
-    const totalAmount = expenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
-    expensesList.innerHTML = expenses.map(expense => `
-       <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; background: white;">
-            <div style="display: flex; justify-content: between; align-items: flex-start;">
-                <div style="flex: 1;">
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-                        <h3 style="font-size: 1.125rem; font-weight: 600; margin: 0;">${expense.name}</h3>
-                        <span class="badge badge-info">₹${(expense.amount || 0).toLocaleString()}</span>
-                        <span style="color: #6b7280; font-size: 0.875rem;">${expense.date}</span>
-                    </div>
-                    ${expense.attachment ? `
-                        <div style="display: flex; align-items: center; gap: 0.5rem; color: #6b7280; font-size: 0.875rem;">
-                            <i class="fas fa-paperclip"></i>
-                            <span>Attachment: ${expense.attachment.name} (${formatFileSize(expense.attachment.size)})</span>
-                            <button onclick="viewAttachment('${expense.id}')" style="color: #3b82f6; text-decoration: underline; border: none; background: none; cursor: pointer;">View</button>
-                        </div>
-                    ` : ''}
-                </div>
-                <button class="btn btn-danger btn-delete-expense " style="padding: 0.25rem 0.5rem;" onclick="deleteExpense('${expense.id}')">
-                    <i class="fas fa-trash"></i>
-                </button>
+// Fixed Expense Functions - Replace your existing expense code with this
+
+let expenseAttachmentFile = null;
+
+function handleExpenseFile(input) {
+  expenseAttachmentFile = input.files[0];
+  if (expenseAttachmentFile) {
+    document.getElementById('expenseFileName').textContent = `${expenseAttachmentFile.name} (${formatFileSize(expenseAttachmentFile.size)})`;
+  }
+}
+
+function addExpense() {
+  const name = document.getElementById('expenseName').value.trim();
+  const amount = parseFloat(document.getElementById('expenseAmount').value);
+
+  if (!name || !amount) {
+    alert('कृपया व्यय का नाम और राशि भरें।');
+    return;
+  }
+
+  if (expenseAttachmentFile) {
+    // Upload file to Firebase Storage
+    const timestamp = Date.now();
+    const fileName = `${timestamp}_${expenseAttachmentFile.name}`;
+    const storageRef = firebase.storage().ref(`expenses/attachments/${fileName}`);
+    const uploadTask = storageRef.put(expenseAttachmentFile);
+
+    console.log("Starting upload for:", fileName);
+
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        // Progress monitoring
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress + '% done');
+      },
+      (error) => {
+        console.error('Upload error:', error);
+        alert('फ़ाइल अपलोड में त्रुटि: ' + error.message);
+      },
+      () => {
+        // Upload completed successfully
+        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+          console.log('File uploaded successfully, URL:', downloadURL);
+          saveExpense(name, amount, downloadURL, expenseAttachmentFile.name, expenseAttachmentFile.size);
+        }).catch((error) => {
+          console.error('Error getting download URL:', error);
+          alert('डाउनलोड URL प्राप्त करने में त्रुटि: ' + error.message);
+        });
+      }
+    );
+  } else {
+    saveExpense(name, amount, null, null, null);
+  }
+}
+
+function saveExpense(name, amount, attachmentURL, attachmentName, attachmentSize) {
+  console.log("Saving expense to Firestore...");
+  
+  const expenseData = {
+    name: name,
+    amount: amount,
+    date: new Date().toLocaleDateString(),
+    timestamp: new Date()
+  };
+
+  // Add attachment info if exists
+  if (attachmentURL) {
+    expenseData.attachmentURL = attachmentURL;
+    expenseData.attachmentName = attachmentName;
+    expenseData.attachmentSize = attachmentSize;
+  }
+
+  db.collection('expenses').add(expenseData)
+    .then((docRef) => {
+      console.log("Expense added with ID: ", docRef.id);
+      alert('व्यय सफलतापूर्वक जोड़ा गया!');
+      clearExpenseForm();
+      loadExpenses();
+    })
+    .catch((error) => {
+      console.error('Error adding expense:', error);
+      alert('व्यय जोड़ने में त्रुटि: ' + error.message);
+    });
+}
+
+function clearExpenseForm() {
+  document.getElementById('expenseName').value = '';
+  document.getElementById('expenseAmount').value = '';
+  document.getElementById('expenseFileName').textContent = 'Click to upload attachment';
+  document.getElementById('expenseFile').value = '';
+  expenseAttachmentFile = null;
+}
+
+// Load all expenses from Firestore
+function loadExpenses() {
+  db.collection("expenses").orderBy("timestamp", "desc").get()
+    .then((querySnapshot) => {
+      const expenses = [];
+      querySnapshot.forEach((doc) => {
+        let data = doc.data();
+        data.id = doc.id;
+        expenses.push(data);
+      });
+      renderExpenses(expenses);
+    })
+    .catch((error) => {
+      console.error("Error loading expenses:", error);
+      alert("Error loading expenses: " + error.message);
+    });
+}
+
+// Render expenses with proper attachment handling
+function renderExpenses(expenses) {
+  const expensesList = document.getElementById('expensesList');
+  const totalAmount = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  
+  expensesList.innerHTML = expenses.map(expense => `
+    <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; background: white;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div style="flex: 1;">
+          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+            <h3 style="font-size: 1.125rem; font-weight: 600; margin: 0;">${expense.name}</h3>
+            <span class="badge badge-info">₹${(expense.amount || 0).toLocaleString()}</span>
+            <span style="color: #6b7280; font-size: 0.875rem;">${expense.date}</span>
+          </div>
+          ${expense.attachmentURL ? `
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: #6b7280; font-size: 0.875rem; flex-wrap: wrap;">
+              <i class="fas fa-paperclip"></i>
+              <span>Attachment: ${expense.attachmentName} ${expense.attachmentSize ? `(${formatFileSize(expense.attachmentSize)})` : ''}</span>
+              <button onclick="viewAttachment('${expense.attachmentURL}', '${expense.attachmentName}')" 
+                      style="color: #3b82f6; text-decoration: underline; border: none; background: none; cursor: pointer; padding: 0.25rem 0.5rem;">
+                View
+              </button>
             </div>
-       </div>
-    `).join('');
-    document.querySelector('#totalExpenses .amount').textContent = `₹${totalAmount.toLocaleString()}`;
+          ` : ''}
+        </div>
+        <button class="btn btn-danger btn-delete-expense" style="padding: 0.25rem 0.5rem;" onclick="deleteExpense('${expense.id}')">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+  
+  document.querySelector('#totalExpenses .amount').textContent = `₹${totalAmount.toLocaleString()}`;
+}
+
+// View attachment function
+function viewAttachment(url, name) {
+  if (url) {
+    // Open in new tab/window
+    window.open(url, '_blank');
+  } else {
+    alert('Attachment not available');
+  }
 }
 
 // Delete expense from Firestore
 function deleteExpense(id) {
-    alert('Deleting expense...');
+  if (confirm('Are you sure you want to delete this expense?')) {
     db.collection("expenses").doc(id).delete()
-        .then(() => {
-            alert('Expense deleted successfully!');
-            loadExpenses();
-        })
-        .catch(e => alert('Expense delete error: ' + e.message));
-}
-
-
-
-
-// Reset expense form as before
-function clearExpenseForm() {
-    document.getElementById('expenseName').value = '';
-    document.getElementById('expenseAmount').value = '';
-    document.getElementById('expenseFileName').textContent = 'Click to upload attachment';
-    document.getElementById('expenseFile').value = '';
-    expenseAttachment = null;
+      .then(() => {
+        alert('Expense deleted successfully!');
+        loadExpenses();
+      })
+      .catch((error) => {
+        console.error('Error deleting expense:', error);
+        alert('Error deleting expense: ' + error.message);
+      });
+  }
 }
   
   function handleGalleryImages(input) {
