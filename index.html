@@ -76,7 +76,24 @@
     .modal-info {position: absolute; bottom: 1rem; left: 1rem; background: rgba(255,255,255,0.9); padding: 0.5rem; border-radius: 0.5rem;}
     .empty-state {text-align: center; padding: 3rem; color: #6b7280;}
     .empty-state i {font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;}
-    @media (max-width: 768px) {.header h1 {font-size: 1.5rem;}.nav-buttons {justify-content: center;}.form-grid {grid-template-columns: 1fr;}.page-grid {grid-template-columns: 1fr;}}
+    @media (max-width: 768px) {.header h1 {font-size: 1.5rem;}.nav-buttons {justify-content: center;}.form-grid {grid-template-columns: 1fr;}.page-grid {grid-template-columns: 1fr;}
+                               .btn, .btn-primary, .btn-secondary, .btn-accent, .btn-danger {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.95rem;
+  }
+  .btn i {
+    font-size: 1rem;
+  }}
+    @media (max-width: 480px) {
+  .btn, .btn-primary, .btn-secondary, .btn-accent, .btn-danger {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.95rem;
+  }
+  .btn i {
+    font-size: 1rem;
+  }
+}
+
   </style>
 </head>
 <body>
