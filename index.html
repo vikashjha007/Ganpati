@@ -491,20 +491,22 @@ function clearExpenseForm() {
 }
 
 // Load all expenses from Firestore
- function loadExpenses() {
-      db.collection("expenses").orderBy("timestamp", "desc").get()
-        .then(snapshot => {
-          const expenses = [];
-          snapshot.forEach(doc => {
-            let data = doc.data();
-            data.id = doc.id;
-            expenses.push(data);
-          });
-          renderExpenses(expenses);
-        })
-        .catch(err => alert("Error loading expenses: " + err.message));
-    }
-
+function loadExpenses() {
+  db.collection("expenses").get()
+    .then(querySnapshot => {
+      const expenses = [];
+      querySnapshot.forEach(doc => {
+        let data = doc.data();
+        data.id = doc.id;
+        expenses.push(data);
+      });
+    alert("inside loading expenses");
+      renderExpenses(expenses);
+    })
+    .catch(error => {
+      alert("Error loading expenses: " + error.message);
+      console.error("Error loading expenses:", error);
+    });
    function formatFileSize(size) {
   if(size < 1024) return size + " B";
   else if(size < 1024 * 1024) return (size / 1024).toFixed(1) + " KB";
@@ -512,6 +514,7 @@ function clearExpenseForm() {
 }
 
 function renderExpenses(expenses) {
+   alert("inside loading expenses "+expenses);
   const container = document.getElementById('expensesList');
   const total = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
 
@@ -575,21 +578,51 @@ document.getElementById('galleryFiles').addEventListener('change', async (event)
     });
 
     // Upload function returning promise
-    function uploadToCloudinary(file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    async function uploadToCloudinary(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
 
-      return fetch(CLOUDINARY_URL, {
-        method: 'POST',
-        body: formData
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.secure_url) return data;
-        else throw new Error(data.error?.message || "Upload failed");
+  const response = await fetch(CLOUDINARY_URL, {
+    method: "POST",
+    body: formData
+  });
+  const data = await response.json();
+  if (!data.secure_url) throw new Error("Upload failed");
+  return data.secure_url;
+}
+
+async function handleGalleryImages(input) {
+  const files = Array.from(input.files);
+  if (files.length === 0) {
+    renderGallery([]);
+    return;
+  }
+
+  let errors = [];
+  for (const file of files) {
+    try {
+      const url = await uploadToCloudinary(file);
+      await db.collection("gallery").add({
+        url,
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        date: new Date().toLocaleDateString(),
       });
+      alert(`Uploaded: ${file.name}`);
+    } catch (err) {
+      errors.push(`${file.name}: ${err.message}`);
     }
+  }
+
+  if (errors.length) {
+    alert("Some uploads failed:\n" + errors.join("\n"));
+  }
+
+  loadGallery();
+}
+
 
     // Load images from Firestore and display
     async function loadGallery() {
