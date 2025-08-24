@@ -714,16 +714,16 @@ async function handleGalleryImages(input) {
 
 let memberPhotoFile = null;
 
+// Handle photo file selection and preview
 function handleMemberPhoto(input) {
   memberPhotoFile = input.files[0];
   const photoPreview = document.getElementById('photoPreview');
-  
+
   if (memberPhotoFile) {
-    // Show preview
     const reader = new FileReader();
     reader.onload = function(e) {
       photoPreview.innerHTML = `
-        <img src="${e.target.result}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #8b5cf6;">
+        <img src="${e.target.result}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #8b5cf6;" />
         <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">${memberPhotoFile.name}</p>
       `;
     };
@@ -736,6 +736,7 @@ function handleMemberPhoto(input) {
   }
 }
 
+// Add member function similar to addExpense/addDonation
 function addMember() {
   const name = document.getElementById('memberName').value.trim();
   const contact = document.getElementById('memberContact').value.trim();
@@ -746,31 +747,22 @@ function addMember() {
   }
 
   if (memberPhotoFile) {
-    // Upload photo to Firebase Storage
     const timestamp = Date.now();
     const fileName = `${timestamp}_${memberPhotoFile.name}`;
     const storageRef = firebase.storage().ref(`members/photos/${fileName}`);
     const uploadTask = storageRef.put(memberPhotoFile);
 
-    console.log("Starting member photo upload for:", fileName);
-
-    uploadTask.on('state_changed',
+    uploadTask.on('state_changed', 
       (snapshot) => {
-        // Progress monitoring
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Member photo upload is ' + progress + '% done');
-      },
+        // Optional: progress indicator
+      }, 
       (error) => {
-        console.error('Member photo upload error:', error);
         alert('फ़ोटो अपलोड में त्रुटि: ' + error.message);
-      },
+      }, 
       () => {
-        // Upload completed successfully
         uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-          console.log('Member photo uploaded successfully, URL:', downloadURL);
           saveMember(name, contact, downloadURL, memberPhotoFile.name);
         }).catch((error) => {
-          console.error('Error getting member photo download URL:', error);
           alert('फ़ोटो URL प्राप्त करने में त्रुटि: ' + error.message);
         });
       }
@@ -780,9 +772,8 @@ function addMember() {
   }
 }
 
+// Save member document in Firestore
 function saveMember(name, contact, photoURL, photoName) {
-  console.log("Saving member to Firestore...");
-  
   const memberData = {
     name: name,
     contact: contact || '',
@@ -790,39 +781,36 @@ function saveMember(name, contact, photoURL, photoName) {
     timestamp: new Date()
   };
 
-  // Add photo info if exists
   if (photoURL) {
     memberData.photoURL = photoURL;
     memberData.photoName = photoName;
   }
 
   db.collection('members').add(memberData)
-    .then((docRef) => {
-      console.log("Member added with ID: ", docRef.id);
+    .then(() => {
       alert('सदस्य सफलतापूर्वक जोड़ा गया!');
       clearMemberForm();
       loadMembers();
     })
-    .catch((error) => {
-      console.error('Error adding member:', error);
+    .catch(error => {
       alert('सदस्य जोड़ने में त्रुटि: ' + error.message);
     });
 }
 
+// Clear member form and photo preview
 function clearMemberForm() {
   document.getElementById('memberName').value = '';
   document.getElementById('memberContact').value = '';
   document.getElementById('memberPhoto').value = '';
   memberPhotoFile = null;
-  
-  // Reset photo preview
+
   document.getElementById('photoPreview').innerHTML = `
     <i class="fas fa-camera" style="font-size: 2rem; color: #6b7280; margin-bottom: 0.5rem;"></i>
     <p id="photoFileName">Click to upload photo</p>
   `;
 }
 
-// Load all members from Firestore
+// Load members and render - you should have this existing or similar
 function loadMembers() {
   db.collection("members").orderBy("timestamp", "desc").get()
     .then((querySnapshot) => {
@@ -835,11 +823,9 @@ function loadMembers() {
       renderMembers(members);
     })
     .catch((error) => {
-      console.error("Error loading members:", error);
       alert("Error loading members: " + error.message);
     });
 }
-
 // Render members grid
 function renderMembers(members) {
   const membersGrid = document.getElementById('membersGrid');
