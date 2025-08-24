@@ -240,7 +240,7 @@
                             <input type="file" id="memberPhoto" accept="image/*" onchange="handleMemberPhoto(this)">
                             <div id="photoPreview">
                                 <i class="fas fa-camera" style="font-size: 2rem; color: #6b7280; margin-bottom: 0.5rem;"></i>
-                                <p id="photoFileName">Click to upload photo</p>
+                                <p id="photoFileName" >Click to upload photo</p>
                             </div>
                         </div>
                         <button class="btn btn-accent" onclick="addMember()">
@@ -712,31 +712,16 @@ async function handleGalleryImages(input) {
 
 // Fixed Member Management Functions - Replace your existing member code with this
 
-let memberPhotoFile = null;
-
-// Handle photo file selection and preview
-function handleMemberPhoto(input) {
-  memberPhotoFile = input.files[0];
-  const photoPreview = document.getElementById('photoPreview');
-
-  if (memberPhotoFile) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      photoPreview.innerHTML = `
-        <img src="${e.target.result}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #8b5cf6;" />
-        <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">${memberPhotoFile.name}</p>
-      `;
-    };
-    reader.readAsDataURL(memberPhotoFile);
-  } else {
-    photoPreview.innerHTML = `
-      <i class="fas fa-camera" style="font-size: 2rem; color: #6b7280; margin-bottom: 0.5rem;"></i>
-      <p id="photoFileName">Click to upload photo</p>
-    `;
-  }
-}
 
 // Add member function similar to addExpense/addDonation
+  let memberPhotoFile = null;
+
+function handleMemberPhoto(input) {
+  memberPhotoFile = input.files[0] || null;
+  if(memberPhotoFile) alert('Selected photo: ' + memberPhotoFile.name);
+  else alert('No photo selected');
+}
+
 function addMember() {
   
   const name = document.getElementById('memberName').value.trim();
