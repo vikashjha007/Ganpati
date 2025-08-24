@@ -515,29 +515,52 @@ function loadExpenses() {
 }
 
 function renderExpenses(expenses) {
-   alert("inside loading expenses "+expenses);
   const container = document.getElementById('expensesList');
   const total = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
 
   container.innerHTML = expenses.map(expense => `
-    <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between;">
-      <div>
-        <strong>${expense.name || ''}</strong><br/>
-        Amount: ₹${expense.amount || 0}<br/>
-        Date: ${expense.date || ''}<br/>
-        ${expense.attachmentURL ? 
-          `<div>
+    <div style="
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-family: Arial, sans-serif;
+      background: #fff;
+    ">
+      <div style="flex-grow: 1; min-width: 180px;">
+        <h3 style="margin: 0 0 0.25rem 0; color: #dc2626;">${expense.name || 'Unknown Expense'}</h3>
+        <div style="font-size: 0.9rem; color: #6b7280;">
+          Date: ${expense.date || 'N/A'}
+        </div>
+        ${expense.attachmentURL ? `
+          <div style="margin-top: 0.25rem;">
             Attachment: ${expense.attachmentName || 'Attachment'} (${formatFileSize(expense.attachmentSize || 0)})
-            <button onclick="window.open('${expense.attachmentURL}','_blank')">View</button>
-          </div>`
-          : ''
-        }
+            <button 
+              onclick="window.open('${expense.attachmentURL}', '_blank')" 
+              style="background: #3b82f6; color: white; border: none; border-radius: 5px; padding: 0.2rem 0.6rem; font-size: 0.8rem; cursor: pointer; margin-left: 0.5rem;">
+              View
+            </button>
+          </div>
+        ` : ''}
       </div>
-      <button onclick="deleteExpense('${expense.id}')" style="background:#ef4444; color:#fff; border:none; border-radius:5px; cursor:pointer;">Delete</button>
+      <div style="min-width: 80px; font-weight: 700; color: #059669; font-size: 1.2rem; text-align: right;">
+        ₹${(expense.amount || 0).toLocaleString()}
+      </div>
+      <button 
+        onclick="deleteExpense('${expense.id}')" 
+        style="background: #ef4444; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 8px; cursor: pointer; flex-shrink: 0;">
+        Delete
+      </button>
     </div>
   `).join('');
 
-  document.getElementById('totalExpenses').textContent = `Total: ₹${total}`;
+  document.getElementById('totalExpenses').textContent = `कुल व्यय: ₹${total.toLocaleString()}`;
 }
 
 
