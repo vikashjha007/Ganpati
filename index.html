@@ -507,6 +507,7 @@ function loadExpenses() {
       alert("Error loading expenses: " + error.message);
       console.error("Error loading expenses:", error);
     });
+}
    function formatFileSize(size) {
   if(size < 1024) return size + " B";
   else if(size < 1024 * 1024) return (size / 1024).toFixed(1) + " KB";
