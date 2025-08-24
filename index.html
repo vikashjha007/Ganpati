@@ -355,10 +355,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const flag = doc.data().Flag;
         
-        alert("document found" + flag);
-        applyVisibility(flag);
+               applyVisibility(flag);
       } else {
-        alert("No flag document found");
+       
         applyVisibility(true); // default to visible if not found
       }
     })
@@ -369,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
   function applyVisibility(flag) {
   const displayStyle = flag ? 'inline-block' : 'none';
-    alert("document display " + displayStyle);
+   
 
   // Donations
   document.querySelectorAll('#add-donation').forEach(el => el.style.display = displayStyle);
