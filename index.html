@@ -557,14 +557,24 @@ function clearExpenseForm() {
       method: "POST",
       body: formData
     })
-      .then(res => res.json())
-      .then(data => {
-        if (data.secure_url) resolve(data);
-        else reject(new Error("Upload failed"));
-      })
-      .catch(err => reject(err));
+    .then(res => res.json())
+    .then(data => {
+      console.log('Cloudinary response:', data);
+      if (data && data.secure_url) {
+        resolve(data);
+      } else if (data.error && data.error.message) {
+        reject(new Error(data.error.message));
+      } else {
+        reject(new Error("Unexpected upload response from Cloudinary"));
+      }
+    })
+    .catch(err => {
+      console.error('Upload error:', err);
+      reject(err);
+    });
   });
 }
+
 
 async function handleGalleryImages(input) {
   const files = Array.from(input.files);
