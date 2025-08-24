@@ -446,9 +446,8 @@ let expenseAttachmentFile = null;
 
 function handleExpenseFile(input) {
   expenseAttachmentFile = input.files[0];
-  if (expenseAttachmentFile) {
-    document.getElementById('expenseFileName').textContent = `${expenseAttachmentFile.name} (${formatFileSize(expenseAttachmentFile.size)})`;
-  }
+  document.getElementById('expenseFileName').textContent = expenseAttachmentFile ?
+    `${expenseAttachmentFile.name} (${formatFileSize(expenseAttachmentFile.size)})` : "संलग्नक: कोई नहीं";
 }
 
 function addExpense() {
@@ -461,68 +460,28 @@ function addExpense() {
   }
 
   if (expenseAttachmentFile) {
-    // Upload file to Firebase Storage
-    const timestamp = Date.now();
-    const fileName = `${timestamp}_${expenseAttachmentFile.name}`;
-    const storageRef = firebase.storage().ref(`expenses/attachments/${fileName}`);
-    const uploadTask = storageRef.put(expenseAttachmentFile);
-
-    console.log("Starting upload for:", fileName);
-
-    uploadTask.on('state_changed',
-      (snapshot) => {
-        // Progress monitoring
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ' + progress + '% done');
-      },
-      (error) => {
-        console.error('Upload error:', error);
-        alert('फ़ाइल अपलोड में त्रुटि: ' + error.message);
-      },
-      () => {
-        // Upload completed successfully
-        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-          console.log('File uploaded successfully, URL:', downloadURL);
-          saveExpense(name, amount, downloadURL, expenseAttachmentFile.name, expenseAttachmentFile.size);
-        }).catch((error) => {
-          console.error('Error getting download URL:', error);
-          alert('डाउनलोड URL प्राप्त करने में त्रुटि: ' + error.message);
-        });
-      }
-    );
+    uploadToCloudinary(expenseAttachmentFile, (url, fname, fsize) => {
+      if (url) saveExpense(name, amount, url, fname, fsize);
+      else alert("Attachment upload failed!");
+    });
   } else {
     saveExpense(name, amount, null, null, null);
   }
 }
 
 function saveExpense(name, amount, attachmentURL, attachmentName, attachmentSize) {
-  console.log("Saving expense to Firestore...");
-  
-  const expenseData = {
-    name: name,
-    amount: amount,
+  db.collection('expenses').add({
+    name,
+    amount,
     date: new Date().toLocaleDateString(),
-    timestamp: new Date()
-  };
-
-  // Add attachment info if exists
-  if (attachmentURL) {
-    expenseData.attachmentURL = attachmentURL;
-    expenseData.attachmentName = attachmentName;
-    expenseData.attachmentSize = attachmentSize;
-  }
-
-  db.collection('expenses').add(expenseData)
-    .then((docRef) => {
-      console.log("Expense added with ID: ", docRef.id);
-      alert('व्यय सफलतापूर्वक जोड़ा गया!');
-      clearExpenseForm();
-      loadExpenses();
-    })
-    .catch((error) => {
-      console.error('Error adding expense:', error);
-      alert('व्यय जोड़ने में त्रुटि: ' + error.message);
-    });
+    attachmentURL: attachmentURL || null,
+    attachmentName: attachmentName || null,
+    attachmentSize: attachmentSize || null
+  }).then(()=>{
+    alert('व्यय सफलतापूर्वक जोड़ा गया!');
+    clearExpenseForm();
+    loadExpenses();
+  }).catch(e=>alert('व्यय जोड़ने में त्रुटि: ' + e.message));
 }
 
 function clearExpenseForm() {
@@ -939,6 +898,29 @@ function getMember(id) {
   
  
   </script>
+  <script>
+const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dosohpffj/upload"; // Replace <cloud_name>
+const CLOUDINARY_UPLOAD_PRESET = "Ganpati2025"; // Replace <upload_preset>
+
+// Universal Cloudinary upload function
+function uploadToCloudinary(file, callback) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+  fetch(CLOUDINARY_URL, {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.secure_url) callback(data.secure_url, data.original_filename, data.bytes);
+    else callback(null, null, null);
+  })
+  .catch(() => callback(null, null, null));
+}
+</script>
+
 
 </body>
 </html>
