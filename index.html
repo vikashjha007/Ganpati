@@ -548,59 +548,55 @@ function clearExpenseForm() {
     window.onload = () => {
       loadExpenses();
     };  
-  function handleGalleryImages(input) {
+ function uploadToCloudinary(file) {
+  return new Promise((resolve, reject) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+    fetch(CLOUDINARY_URL, {
+      method: "POST",
+      body: formData
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.secure_url) resolve(data);
+        else reject(new Error("Upload failed"));
+      })
+      .catch(err => reject(err));
+  });
+}
+
+async function handleGalleryImages(input) {
   const files = Array.from(input.files);
   if (files.length === 0) {
-    renderGallery();
+    renderGallery([]);
     return;
   }
 
-  const uploadPromises = [];
-  const storageRef = firebase.storage().ref();
+  let uploadErrors = [];
 
-  files.forEach(file => {
-    const uniqueName = 'gallery/images/' + Date.now() + '_' + file.name;
-    const fileRef = storageRef.child(uniqueName);
+  for (const file of files) {
+    try {
+      const uploadResult = await uploadToCloudinary(file);
+      await db.collection('gallery').add({
+        url: uploadResult.secure_url,
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        date: new Date().toLocaleDateString()
+      });
+      alert(`Image "${file.name}" uploaded successfully.`);
+    } catch (err) {
+      uploadErrors.push({ file: file.name, error: err.message });
+    }
+  }
 
-    // Upload file to Storage
-    const uploadTask = fileRef.put(file);
+  if (uploadErrors.length > 0) {
+    alert(`Some uploads failed:\n${uploadErrors.map(e => `${e.file}: ${e.error}`).join("\n")}`);
+  }
 
-    uploadPromises.push(new Promise((resolve, reject) => {
-      uploadTask.on('state_changed',
-        null,
-        error => {
-          alert(`Upload failed: ${file.name} - ${error.message}`);
-          reject(error);
-        },
-        () => {
-          // Upload complete, get download URL
-          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-            // Save file info in Firestore
-            db.collection('gallery').add({
-              url: downloadURL,
-              name: file.name,
-              type: file.type,
-              size: file.size,
-              date: new Date().toLocaleDateString()
-            }).then(() => {
-              alert(`Image uploaded successfully: ${file.name}`);
-              resolve();
-            }).catch(error => {
-              alert(`Firestore save failed: ${error.message}`);
-              reject(error);
-            });
-          });
-        }
-      );
-    }));
-  });
-
-  // Wait for all uploads to finish before reloading gallery
-  Promise.all(uploadPromises).then(() => {
-    loadGallery();
-  }).catch(() => {
-    console.error("One or more uploads failed.");
-  });
+  await loadGallery();
 }
 
 function loadGallery() {
@@ -622,17 +618,15 @@ function renderGallery(galleryImages) {
     imageGrid.innerHTML = '';
     galleryEmpty.style.display = 'block';
   } else {
+    galleryEmpty.style.display = 'none';
     imageGrid.innerHTML = galleryImages.map(img => `
       <div class="image-item">
         <button class="delete-btn" onclick="deleteGalleryImage('${img.id}')"><i class="fas fa-times"></i></button>
         <img src="${img.url}" alt="${img.name}" onclick="showModal('${img.url}', '${img.name}', '${img.date}')"/>
       </div>
     `).join('');
-    galleryEmpty.style.display = 'none';
   }
 }
-
-
 // Fixed Member Management Functions - Replace your existing member code with this
 
 let memberPhotoFile = null;
