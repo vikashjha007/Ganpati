@@ -257,25 +257,25 @@
             </div>
         </div>
         <!-- Gallery Page -->
-        <div id="gallery" class="page">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-images" style="color: #ea580c; font-size: 1.5rem;"></i>
-                    <h2>Image Gallery</h2>
-                </div>
-                <div class="file-upload btn-upload-image" style="margin-bottom: 2rem;" onclick="document.getElementById('galleryImages').click()">
-                    <input type="file" id="galleryImages" accept="image/*" multiple onchange="handleGalleryImages(this)">
-                    <i class="fas fa-camera" style="font-size: 3rem; color: #6b7280; margin-bottom: 1rem;"></i>
-                    <h3 style="margin-bottom: 0.5rem; color: #374151;">Upload Festival Photos</h3>
-                    <p style="color: #6b7280;">Click to select multiple images</p>
-                </div>
-                <div class="image-grid" id="imageGrid"></div>
-                <div id="galleryEmpty" class="empty-state">
-                    <i class="fas fa-images"></i>
-                    <p>No images uploaded yet</p>
-                </div>
-            </div>
-        </div>
+        <div class="card">
+    <h2>गैलरी में तस्वीरें अपलोड करें</h2>
+    <label class="file-input" for="galleryFiles">
+      <i class="fas fa-camera" style="font-size: 36px; color: #ea580c;"></i>
+      <p>क्लिक करें या ड्रैग करें यहाँ तस्वीरें अपलोड करने के लिए</p>
+      <input type="file" id="galleryFiles" accept="image/*" multiple />
+    </label>
+    <div class="image-grid" id="imageGrid"></div>
+    <div id="galleryEmpty" style="text-align:center; margin-top: 1rem; color: #aaa;">कोई तस्वीरें उपलब्ध नहीं हैं।</div>
+  </div>
+
+  <!-- Modal for image viewing -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">&times;</button>
+      <img id="modalImage" src="" alt="Preview" />
+      <div class="modal-info" id="modalInfo"></div>
+    </div>
+  </div>
 </div>
 <!-- Modal -->
 <div class="modal" id="imageModal">
@@ -547,95 +547,108 @@ function clearExpenseForm() {
     window.onload = () => {
       loadExpenses();
     };  
- function uploadToCloudinary(file) {
-  return new Promise((resolve, reject) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+document.getElementById('galleryFiles').addEventListener('change', async (event) => {
+      const files = Array.from(event.target.files);
+      if (files.length === 0) return;
 
-    fetch(CLOUDINARY_URL, {
-      method: "POST",
-      body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-      console.log('Cloudinary response:', data);
-      if (data && data.secure_url) {
-        resolve(data);
-      } else if (data.error && data.error.message) {
-        reject(new Error(data.error.message));
-      } else {
-        reject(new Error("Unexpected upload response from Cloudinary"));
+      for (const file of files) {
+        try {
+          const uploaded = await uploadToCloudinary(file);
+          await db.collection('gallery').add({
+            url: uploaded.secure_url,
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            date: new Date().toLocaleDateString()
+          });
+          alert(`Uploaded ${file.name}`);
+        } catch (e) {
+          alert(`Failed to upload ${file.name}: ${e.message}`);
+        }
       }
-    })
-    .catch(err => {
-      console.error('Upload error:', err);
-      reject(err);
+      event.target.value = ""; // reset file input
+      loadGallery();
     });
-  });
-}
 
+    // Upload function returning promise
+    function uploadToCloudinary(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
-async function handleGalleryImages(input) {
-  const files = Array.from(input.files);
-  if (files.length === 0) {
-    renderGallery([]);
-    return;
-  }
-
-  let uploadErrors = [];
-
-  for (const file of files) {
-    try {
-      const uploadResult = await uploadToCloudinary(file);
-      await db.collection('gallery').add({
-        url: uploadResult.secure_url,
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        date: new Date().toLocaleDateString()
+      return fetch(CLOUDINARY_URL, {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.secure_url) return data;
+        else throw new Error(data.error?.message || "Upload failed");
       });
-      alert(`Image "${file.name}" uploaded successfully.`);
-    } catch (err) {
-      uploadErrors.push({ file: file.name, error: err.message });
     }
-  }
 
-  if (uploadErrors.length > 0) {
-    alert(`Some uploads failed:\n${uploadErrors.map(e => `${e.file}: ${e.error}`).join("\n")}`);
-  }
+    // Load images from Firestore and display
+    async function loadGallery() {
+      const snapshot = await db.collection('gallery').orderBy('date', 'desc').get();
+      const images = [];
+      snapshot.forEach(doc => {
+        images.push({ id: doc.id, ...doc.data() });
+      });
+      renderGallery(images);
+    }
 
-  await loadGallery();
-}
+    function renderGallery(images) {
+      const container = document.getElementById('imageGrid');
+      const emptyMsg = document.getElementById('galleryEmpty');
+      if (images.length === 0) {
+        container.innerHTML = "";
+        emptyMsg.style.display = "block";
+        return;
+      }
+      emptyMsg.style.display = "none";
+      container.innerHTML = images.map(img => `
+        <div class="image-item">
+          <button class="delete-btn" onclick="deleteImage('${img.id}')"><i class="fas fa-times"></i></button>
+          <img src="${img.url}" alt="${img.name}" onclick="showModal('${img.url}', '${img.name}', '${img.date}')" />
+        </div>
+      `).join('');
+    }
 
-function loadGallery() {
-  db.collection('gallery').get().then(querySnapshot => {
-    const galleryImages = [];
-    querySnapshot.forEach(doc => {
-      const data = doc.data();
-      data.id = doc.id;
-      galleryImages.push(data);
+    // Delete image from Firestore
+    function deleteImage(id) {
+      if (!confirm("क्या आप वाकई इस फोटो को हटाना चाहते हैं?")) return;
+      db.collection('gallery').doc(id).delete()
+        .then(() => {
+          alert('तस्वीर सफलतापूर्वक हटाई गई।');
+          loadGallery();
+        })
+        .catch(e => alert('त्रुटि: ' + e.message));
+    }
+
+    // Modal controls
+    const modal = document.getElementById('modal');
+    const modalImage = document.getElementById('modalImage');
+    const modalInfo = document.getElementById('modalInfo');
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeModal();
     });
-    renderGallery(galleryImages);
-  });
-}
 
-function renderGallery(galleryImages) {
-  const imageGrid = document.getElementById('imageGrid');
-  const galleryEmpty = document.getElementById('galleryEmpty');
-  if (!galleryImages.length) {
-    imageGrid.innerHTML = '';
-    galleryEmpty.style.display = 'block';
-  } else {
-    galleryEmpty.style.display = 'none';
-    imageGrid.innerHTML = galleryImages.map(img => `
-      <div class="image-item">
-        <button class="delete-btn" onclick="deleteGalleryImage('${img.id}')"><i class="fas fa-times"></i></button>
-        <img src="${img.url}" alt="${img.name}" onclick="showModal('${img.url}', '${img.name}', '${img.date}')"/>
-      </div>
-    `).join('');
-  }
-}
+    function showModal(url, name, date) {
+      modalImage.src = url;
+      modalInfo.textContent = `${name} | ${date}`;
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+      modalImage.src = '';
+      modalInfo.textContent = '';
+    }
+
+    // Load gallery on page load
+    window.onload = loadGallery;
+
 // Fixed Member Management Functions - Replace your existing member code with this
 
 let memberPhotoFile = null;
