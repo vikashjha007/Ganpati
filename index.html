@@ -738,15 +738,17 @@ function handleMemberPhoto(input) {
 
 // Add member function similar to addExpense/addDonation
 function addMember() {
+  
   const name = document.getElementById('memberName').value.trim();
   const contact = document.getElementById('memberContact').value.trim();
-
+alert('name' + name + "contact" + contact);
   if (!name) {
     alert('कृपया सदस्य का नाम भरें।');
     return;
   }
 
   if (memberPhotoFile) {
+alert('inside member photo' + memberPhotoFile );
     const timestamp = Date.now();
     const fileName = `${timestamp}_${memberPhotoFile.name}`;
     const storageRef = firebase.storage().ref(`members/photos/${fileName}`);
@@ -774,6 +776,7 @@ function addMember() {
 
 // Save member document in Firestore
 function saveMember(name, contact, photoURL, photoName) {
+  ("inside save member");
   const memberData = {
     name: name,
     contact: contact || '',
