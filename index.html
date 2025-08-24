@@ -717,6 +717,7 @@ async function handleGalleryImages(input) {
   let memberPhotoFile = null;
 
 function handleMemberPhoto(input) {
+alert("inside handle");
   memberPhotoFile = input.files[0] || null;
   if(memberPhotoFile) alert('Selected photo: ' + memberPhotoFile.name);
   else alert('No photo selected');
