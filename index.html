@@ -256,26 +256,25 @@
                 </div>
             </div>
         </div>
-        <!-- Gallery Page -->
-        <div class="card">
-    <h2>गैलरी में तस्वीरें अपलोड करें</h2>
-    <label class="file-input" for="galleryFiles">
-      <i class="fas fa-camera" style="font-size: 36px; color: #ea580c;"></i>
-      <p>क्लिक करें या ड्रैग करें यहाँ तस्वीरें अपलोड करने के लिए</p>
-      <input type="file" id="galleryFiles" accept="image/*" multiple />
-    </label>
-    <div class="image-grid" id="imageGrid"></div>
-    <div id="galleryEmpty" style="text-align:center; margin-top: 1rem; color: #aaa;">कोई तस्वीरें उपलब्ध नहीं हैं।</div>
-  </div>
-
-  <!-- Modal for image viewing -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <button class="modal-close" id="modalClose">&times;</button>
-      <img id="modalImage" src="" alt="Preview" />
-      <div class="modal-info" id="modalInfo"></div>
-    </div>
-  </div>
+      <div id="gallery" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-images" style="color: #ea580c; font-size: 1.5rem;"></i>
+                    <h2>Image Gallery</h2>
+                </div>
+                <div class="file-upload btn-upload-image" style="margin-bottom: 2rem;" onclick="document.getElementById('galleryImages').click()">
+                    <input type="file" id="galleryImages" accept="image/*" multiple onchange="handleGalleryImages(this)">
+                    <i class="fas fa-camera" style="font-size: 3rem; color: #6b7280; margin-bottom: 1rem;"></i>
+                    <h3 style="margin-bottom: 0.5rem; color: #374151;">Upload Festival Photos</h3>
+                    <p style="color: #6b7280;">Click to select multiple images</p>
+                </div>
+                <div class="image-grid" id="imageGrid"></div>
+                <div id="galleryEmpty" class="empty-state">
+                    <i class="fas fa-images"></i>
+                    <p>No images uploaded yet</p>
+                </div>
+            </div>
+        </div>
 </div>
 <!-- Modal -->
 <div class="modal" id="imageModal">
@@ -506,32 +505,37 @@ function clearExpenseForm() {
         .catch(err => alert("Error loading expenses: " + err.message));
     }
 
-    function renderExpenses(expenses) {
-      const container = document.getElementById('expensesList');
-      const total = expenses.reduce((sum, exp) => sum + (parseFloat(exp.amount) || 0), 0);
-      
-      container.innerHTML = expenses.map(expense => `
-        <div class="expense-item">
-          <div class="expense-info">
-            <h3 class="expense-title">${expense.name}</h3>
-            <div>
-              <span class="expense-amount">₹${expense.amount.toLocaleString()}</span>
-              <span class="expense-date">${expense.date}</span>
-            </div>
-            ${expense.attachmentURL ? `
-              <div class="attachment">
-                <i class="fas fa-paperclip"></i>
-                <span>${expense.attachmentName || 'Attachment'}</span>
-                <button class="btn-view" onclick="window.open('${expense.attachmentURL}', '_blank')">View</button>
-              </div>
-            ` : ''}
-          </div>
-          <button class="btn-delete" onclick="deleteExpense('${expense.id}')"><i class="fas fa-trash"></i></button>
-        </div>
-      `).join('');
-      
-      document.getElementById('totalExpenses').textContent = `कुल व्यय: ₹${total.toLocaleString()}`;
-    }
+   function formatFileSize(size) {
+  if(size < 1024) return size + " B";
+  else if(size < 1024 * 1024) return (size / 1024).toFixed(1) + " KB";
+  else return (size / (1024 * 1024)).toFixed(1) + " MB";
+}
+
+function renderExpenses(expenses) {
+  const container = document.getElementById('expensesList');
+  const total = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+
+  container.innerHTML = expenses.map(expense => `
+    <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between;">
+      <div>
+        <strong>${expense.name || ''}</strong><br/>
+        Amount: ₹${expense.amount || 0}<br/>
+        Date: ${expense.date || ''}<br/>
+        ${expense.attachmentURL ? 
+          `<div>
+            Attachment: ${expense.attachmentName || 'Attachment'} (${formatFileSize(expense.attachmentSize || 0)})
+            <button onclick="window.open('${expense.attachmentURL}','_blank')">View</button>
+          </div>`
+          : ''
+        }
+      </div>
+      <button onclick="deleteExpense('${expense.id}')" style="background:#ef4444; color:#fff; border:none; border-radius:5px; cursor:pointer;">Delete</button>
+    </div>
+  `).join('');
+
+  document.getElementById('totalExpenses').textContent = `Total: ₹${total}`;
+}
+
 
     function deleteExpense(id) {
       if(confirm("क्या आप इस व्यय को हटाना चाहते हैं?")) {
