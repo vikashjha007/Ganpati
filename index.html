@@ -578,138 +578,308 @@ function renderExpenses(expenses) {
     window.onload = () => {
       loadExpenses();
     };  
-document.getElementById('galleryFiles').addEventListener('change', async (event) => {
-      const files = Array.from(event.target.files);
-      if (files.length === 0) return;
+let galleryImages = [];
 
-      for (const file of files) {
-        try {
-          const uploaded = await uploadToCloudinary(file);
-          await db.collection('gallery').add({
-            url: uploaded.secure_url,
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            date: new Date().toLocaleDateString()
-          });
-          alert(`Uploaded ${file.name}`);
-        } catch (e) {
-          alert(`Failed to upload ${file.name}: ${e.message}`);
-        }
-      }
-      event.target.value = ""; // reset file input
-      loadGallery();
-    });
-
-    // Upload function returning promise
-    async function uploadToCloudinary(file) {
+// Universal Cloudinary upload function (updated to work with both patterns)
+async function uploadToCloudinary(file, callback = null) {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
 
-  const response = await fetch(CLOUDINARY_URL, {
-    method: "POST",
-    body: formData
-  });
-  const data = await response.json();
-  if (!data.secure_url) throw new Error("Upload failed");
-  return data.secure_url;
+  try {
+    const response = await fetch(CLOUDINARY_URL, {
+      method: "POST",
+      body: formData
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.secure_url) {
+      throw new Error("Upload failed - no URL returned");
+    }
+    
+    // If callback provided, use callback pattern (for expenses/members)
+    if (callback) {
+      callback(data.secure_url, data.original_filename || file.name, data.bytes || file.size);
+      return;
+    }
+    
+    // Otherwise return data (for gallery)
+    return data;
+  } catch (error) {
+    console.error('Cloudinary upload error:', error);
+    if (callback) {
+      callback(null, null, null);
+    } else {
+      throw error;
+    }
+  }
 }
 
+// Handle gallery image uploads
 async function handleGalleryImages(input) {
   const files = Array.from(input.files);
+  
   if (files.length === 0) {
-    renderGallery([]);
+    alert('कोई फाइल चयनित नहीं है।');
     return;
   }
 
+  // Validate file types
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+  const invalidFiles = files.filter(file => !validTypes.includes(file.type));
+  
+  if (invalidFiles.length > 0) {
+    alert('कृपया केवल image फाइलें चुनें (JPG, PNG, GIF, WebP)');
+    return;
+  }
+
+  let successCount = 0;
   let errors = [];
-  for (const file of files) {
+  const totalFiles = files.length;
+
+  // Show progress
+  alert(`${totalFiles} फाइलें अपलोड हो रही हैं... कृपया प्रतीक्षा करें।`);
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
     try {
-      const url = await uploadToCloudinary(file);
+      console.log(`Uploading ${i + 1}/${totalFiles}: ${file.name}`);
+      
+      // Upload to Cloudinary
+      const uploadResult = await uploadToCloudinary(file);
+      
+      // Save to Firestore
       await db.collection("gallery").add({
-        url,
+        url: uploadResult.secure_url,
         name: file.name,
         type: file.type,
         size: file.size,
-        date: new Date().toLocaleDateString(),
+        date: new Date().toLocaleDateString('hi-IN'),
+        uploadDate: new Date(),
+        publicId: uploadResult.public_id || null
       });
-      alert(`Uploaded: ${file.name}`);
+      
+      successCount++;
+      console.log(`Successfully uploaded: ${file.name}`);
+      
     } catch (err) {
+      console.error(`Failed to upload ${file.name}:`, err);
       errors.push(`${file.name}: ${err.message}`);
     }
   }
 
-  if (errors.length) {
-    alert("Some uploads failed:\n" + errors.join("\n"));
+  // Show results
+  if (successCount > 0 && errors.length === 0) {
+    alert(`सभी ${successCount} फोटो सफलतापूर्वक अपलोड हुईं!`);
+  } else if (successCount > 0) {
+    alert(`${successCount}/${totalFiles} फोटो अपलोड हुईं।\n\nअसफल:\n${errors.join('\n')}`);
+  } else {
+    alert(`कोई भी फोटो अपलोड नहीं हुई:\n${errors.join('\n')}`);
   }
 
+  // Reset file input and reload gallery
+  input.value = "";
   loadGallery();
 }
 
-
-    // Load images from Firestore and display
-    async function loadGallery() {
-      const snapshot = await db.collection('gallery').orderBy('date', 'desc').get();
-      const images = [];
-      snapshot.forEach(doc => {
-        images.push({ id: doc.id, ...doc.data() });
+// Load images from Firestore
+async function loadGallery() {
+  try {
+    console.log('Loading gallery images...');
+    const snapshot = await db.collection('gallery')
+                            .orderBy('uploadDate', 'desc')
+                            .get();
+    
+    galleryImages = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      galleryImages.push({ 
+        id: doc.id, 
+        ...data 
       });
-      renderGallery(images);
-    }
-
-    function renderGallery(images) {
-      const container = document.getElementById('imageGrid');
-      const emptyMsg = document.getElementById('galleryEmpty');
-      if (images.length === 0) {
-        container.innerHTML = "";
-        emptyMsg.style.display = "block";
-        return;
-      }
-      emptyMsg.style.display = "none";
-      container.innerHTML = images.map(img => `
-        <div class="image-item">
-          <button class="delete-btn" onclick="deleteImage('${img.id}')"><i class="fas fa-times"></i></button>
-          <img src="${img.url}" alt="${img.name}" onclick="showModal('${img.url}', '${img.name}', '${img.date}')" />
-        </div>
-      `).join('');
-    }
-
-    // Delete image from Firestore
-    function deleteImage(id) {
-      if (!confirm("क्या आप वाकई इस फोटो को हटाना चाहते हैं?")) return;
-      db.collection('gallery').doc(id).delete()
-        .then(() => {
-          alert('तस्वीर सफलतापूर्वक हटाई गई।');
-          loadGallery();
-        })
-        .catch(e => alert('त्रुटि: ' + e.message));
-    }
-
-    // Modal controls
-    const modal = document.getElementById('modal');
-    const modalImage = document.getElementById('modalImage');
-    const modalInfo = document.getElementById('modalInfo');
-    document.getElementById('modalClose').addEventListener('click', closeModal);
-    modal.addEventListener('click', e => {
-      if (e.target === modal) closeModal();
     });
-
-    function showModal(url, name, date) {
-      modalImage.src = url;
-      modalInfo.textContent = `${name} | ${date}`;
-      modal.style.display = 'flex';
+    
+    console.log(`Loaded ${galleryImages.length} images`);
+    renderGallery(galleryImages);
+    
+  } catch (error) {
+    console.error("Error loading gallery:", error);
+    
+    // Try alternative query if orderBy fails
+    try {
+      const snapshot = await db.collection('gallery').get();
+      galleryImages = [];
+      snapshot.forEach(doc => {
+        galleryImages.push({ id: doc.id, ...doc.data() });
+      });
+      
+      // Sort manually if orderBy failed
+      galleryImages.sort((a, b) => {
+        const dateA = a.uploadDate ? new Date(a.uploadDate.toDate()) : new Date();
+        const dateB = b.uploadDate ? new Date(b.uploadDate.toDate()) : new Date();
+        return dateB - dateA;
+      });
+      
+      renderGallery(galleryImages);
+    } catch (fallbackError) {
+      console.error("Fallback load also failed:", fallbackError);
+      alert("गैलरी लोड करने में त्रुटि: " + fallbackError.message);
+      renderGallery([]);
     }
+  }
+}
 
-    function closeModal() {
-      modal.style.display = 'none';
-      modalImage.src = '';
-      modalInfo.textContent = '';
+// Render gallery images
+function renderGallery(images) {
+  const container = document.getElementById('imageGrid');
+  const emptyMsg = document.getElementById('galleryEmpty');
+  
+  if (!container) {
+    console.error('imageGrid element not found');
+    return;
+  }
+  
+  if (!images || images.length === 0) {
+    container.innerHTML = "";
+    if (emptyMsg) emptyMsg.style.display = "block";
+    return;
+  }
+  
+  if (emptyMsg) emptyMsg.style.display = "none";
+  
+  container.innerHTML = images.map(img => `
+    <div class="image-item">
+      <button class="delete-btn" onclick="deleteImage('${img.id}')" title="फोटो हटाएं">
+        <i class="fas fa-times"></i>
+      </button>
+      <img 
+        src="${img.url}" 
+        alt="${img.name || 'Gallery Image'}" 
+        onclick="showModal('${img.url}', '${img.name || 'Unknown'}', '${img.date || 'Unknown date}')" 
+        onerror="this.style.display='none'"
+        loading="lazy"
+      />
+    </div>
+  `).join('');
+  
+  console.log(`Rendered ${images.length} images`);
+}
+
+// Delete image from Firestore
+function deleteImage(id) {
+  if (!confirm("क्या आप वाकई इस फोटो को हटाना चाहते हैं?")) {
+    return;
+  }
+  
+  db.collection('gallery').doc(id).delete()
+    .then(() => {
+      alert('तस्वीर सफलतापूर्वक हटाई गई।');
+      loadGallery();
+    })
+    .catch(error => {
+      console.error('Error deleting image:', error);
+      alert('तस्वीर हटाने में त्रुटि: ' + error.message);
+    });
+}
+
+// Modal functions
+function showModal(url, name, date) {
+  const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
+  const modalImageName = document.getElementById('modalImageName');
+  const modalImageDate = document.getElementById('modalImageDate');
+  
+  if (!modal || !modalImage) {
+    console.error('Modal elements not found');
+    return;
+  }
+  
+  modalImage.src = url;
+  
+  if (modalImageName) modalImageName.textContent = name;
+  if (modalImageDate) modalImageDate.textContent = date;
+  
+  modal.classList.add('active');
+  
+  // Prevent body scroll when modal is open
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
+  
+  if (!modal || !modalImage) {
+    console.error('Modal elements not found');
+    return;
+  }
+  
+  modal.classList.remove('active');
+  modalImage.src = '';
+  
+  // Restore body scroll
+  document.body.style.overflow = 'auto';
+}
+
+// Event listeners for modal (add this to your DOMContentLoaded event)
+function initializeGalleryEvents() {
+  // Close modal when clicking outside
+  const modal = document.getElementById('imageModal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+  }
+  
+  // Close modal with Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+      closeModal();
     }
+  });
+  
+  // Close button
+  const closeBtn = document.querySelector('.modal-close');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeModal);
+  }
+}
 
-    // Load gallery on page load
-    window.onload = loadGallery;
+// File size formatter
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
 
+// Initialize gallery when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize gallery events
+  initializeGalleryEvents();
+  
+  // Load gallery images
+  loadGallery();
+});
+
+// Alternative initialization if DOMContentLoaded already fired
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeGalleryEvents();
+    loadGallery();
+  });
+} else {
+  initializeGalleryEvents();
+  loadGallery();
+}
 // Fixed Member Management Functions - Replace your existing member code with this
 
 
