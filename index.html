@@ -760,7 +760,7 @@ function renderGallery(images) {
       <img 
         src="${img.url}" 
         alt="${img.name || 'Gallery Image'}" 
-        onclick="showModal('${img.url}', '${img.name || 'Unknown'}', '${img.date || 'Unknown date}')" 
+        onclick="showModal('${imgUrl}', '${imgName}', '${imgDate}')" 
         onerror="this.style.display='none'"
         loading="lazy"
       />
