@@ -714,13 +714,16 @@ async function handleGalleryImages(input) {
 
 
 // Add member function similar to addExpense/addDonation
-  let memberPhotoFile = null;
+ let memberPhotoFile = null;
 
+// Your other functions...
 function handleMemberPhoto(input) {
-alert("inside handle");
-  memberPhotoFile = input.files[0] || null;
-  if(memberPhotoFile) alert('Selected photo: ' + memberPhotoFile.name);
-  else alert('No photo selected');
+    alert("inside handle");
+    memberPhotoFile = input.files[0] || null;
+    if(memberPhotoFile) 
+        alert('Selected photo: ' + memberPhotoFile.name);
+    else 
+        alert('No photo selected');
 }
 
 function addMember() {
