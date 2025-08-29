@@ -585,7 +585,7 @@ async function uploadToCloudinary(file, callback = null) {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-
+alert('inside upload');
   try {
     const response = await fetch(CLOUDINARY_URL, {
       method: "POST",
