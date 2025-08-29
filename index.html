@@ -729,38 +729,25 @@ function handleMemberPhoto(input) {
 function addMember() {
   
   const name = document.getElementById('memberName').value.trim();
-  const contact = document.getElementById('memberContact').value.trim();
-alert('name' + name + "contact" + contact);
-  if (!name) {
-    alert('कृपया सदस्य का नाम भरें।');
-    return;
-  }
+    const contact = document.getElementById('memberContact').value.trim();
+    
+    if (!name) {
+        alert('कृपया सदस्य का नाम भरें।');
+        return;
+    }
 
-  if (memberPhotoFile) {
-alert('inside member photo' + memberPhotoFile );
-    const timestamp = Date.now();
-    const fileName = `${timestamp}_${memberPhotoFile.name}`;
-    const storageRef = firebase.storage().ref(`members/photos/${fileName}`);
-    const uploadTask = storageRef.put(memberPhotoFile);
-
-    uploadTask.on('state_changed', 
-      (snapshot) => {
-        // Optional: progress indicator
-      }, 
-      (error) => {
-        alert('फ़ोटो अपलोड में त्रुटि: ' + error.message);
-      }, 
-      () => {
-        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-          saveMember(name, contact, downloadURL, memberPhotoFile.name);
-        }).catch((error) => {
-          alert('फ़ोटो URL प्राप्त करने में त्रुटि: ' + error.message);
+    if (memberPhotoFile) {
+        // Use Cloudinary upload function (same as expenses)
+        uploadToCloudinary(memberPhotoFile, (url, fname, fsize) => {
+            if (url) {
+                saveMember(name, contact, url, fname);
+            } else {
+                alert("फ़ोटो अपलोड में त्रुटि!");
+            }
         });
-      }
-    );
-  } else {
-    saveMember(name, contact, null, null);
-  }
+    } else {
+        saveMember(name, contact, null, null);
+    }
 }
 
 // Save member document in Firestore
