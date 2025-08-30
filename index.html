@@ -613,26 +613,34 @@ async function handleGalleryImages(input) {
       console.log(`Uploading ${i + 1}/${totalFiles}: ${file.name}`);
       
       // Upload to Cloudinary
-      const uploadResult = await uploadToCloudinary(file);
-uploadToCloudinary(file, (url, fname, fsize) => {
-            if (url) {
-               db.collection("gallery").add({
-        url: uploadResult.secure_url,
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        date: new Date().toLocaleDateString('hi-IN'),
-        uploadDate: new Date(),
-        publicId: uploadResult.public_id || null
-      });
-            } else {
-                alert("फ़ोटो अपलोड में त्रुटि!");
-            }
+      //const uploadResult = await uploadToCloudinary(file);
+       uploadToCloudinary(file, (url, fname, fsize) => {
+    if (url) {
+       try {
+        // Save to Firestore after successful upload
+        await db.collection("gallery").add({
+          url: url,                    // Cloudinary URL
+          name: filename || file.name, // Use Cloudinary filename or fallback to original
+          type: file.type,
+          size: size || file.size,     // Use Cloudinary size or fallback to original
+          date: new Date().toLocaleDateString('hi-IN'),
+          uploadDate: new Date(),
+          publicId: publicId || null
         });
-      alert(`inside... कृपया प्रतीक्षा करें।`);
-      // Save to Firestore
-      //await 
-      
+        
+        console.log('Upload and save successful');
+        alert('फ़ाइल सफलतापूर्वक अपलोड हुई!');
+        
+      } catch (dbError) {
+        console.error('Database save failed:', dbError);
+        alert("डेटाबेस में सेव करने में त्रुटि!");
+      }
+    } else {
+      console.error('Upload failed');
+      alert("फ़ाइल अपलोड में त्रुटि!");
+    }
+          });
+    
       successCount++;
       console.log(`Successfully uploaded: ${file.name}`);
       
