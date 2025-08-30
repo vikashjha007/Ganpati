@@ -158,19 +158,38 @@
                     <i class="fas fa-donate" style="color: #10b981; font-size: 1.5rem;"></i>
                     <h2>Donation Management</h2>
                 </div>
-                <div class="form-grid" id="add-donation">
-                    <input type="text" class="form-input" id="roomNumber" placeholder="Room Number">
-                    <input type="text" class="form-input" id="donorName" placeholder="Donor Name">
-                    <select class="form-input" id="paymentMode">
-                        <option value="cash">Cash</option>
-                        <option value="online">Online</option>
-                    </select>
-                    <input type="number" class="form-input" id="donationAmount" placeholder="Amount (₹)">
-                    <button class="btn btn-primary" onclick="addDonation()">
-                        <i class="fas fa-plus"></i>
-                        Add Donation
-                    </button>
-                </div>
+               <div class="form-grid" id="add-donation">
+    <input 
+        type="text" 
+        class="form-input" 
+        id="roomNumber" 
+        placeholder="Room Number"
+    >
+
+    <input 
+        type="text" 
+        class="form-input" 
+        id="donorName" 
+        placeholder="Donor Name"
+    >
+
+    <select class="form-input" id="paymentMode">
+        <option value="cash">Cash</option>
+        <option value="online">Online</option>
+    </select>
+
+    <input 
+        type="number" 
+        class="form-input" 
+        id="donationAmount" 
+        placeholder="Amount (₹)"
+    >
+
+    <button class="btn btn-primary" onclick="addDonation()">
+        <i class="fas fa-plus"></i>
+        Add Donation
+    </button>
+</div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
