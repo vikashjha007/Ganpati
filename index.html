@@ -472,7 +472,7 @@ function addExpense() {
   const amount = parseFloat(document.getElementById('expenseAmount').value);
 
   if (!name || !amount) {
-    alert('कृपया व्यय का नाम और राशि भरें।');
+    alert('please fill expense name and amount।');
     return;
   }
 
@@ -495,7 +495,7 @@ function saveExpense(name, amount, attachmentURL, attachmentName, attachmentSize
     attachmentName: attachmentName || null,
     attachmentSize: attachmentSize || null
   }).then(()=>{
-    alert('व्यय सफलतापूर्वक जोड़ा गया!');
+    alert('sucessfully added expense!');
     clearExpenseForm();
     loadExpenses();
   }).catch(e=>alert('व्यय जोड़ने में त्रुटि: ' + e.message));
@@ -519,7 +519,7 @@ function loadExpenses() {
         data.id = doc.id;
         expenses.push(data);
       });
-    alert("inside loading expenses");
+  
       renderExpenses(expenses);
     })
     .catch(error => {
@@ -587,7 +587,7 @@ function renderExpenses(expenses) {
       if(confirm("क्या आप इस व्यय को हटाना चाहते हैं?")) {
         db.collection('expenses').doc(id).delete()
           .then(() => {
-            alert("व्यय सफलतापूर्वक हटाया गया!");
+            alert("sucessfully removed expense!");
             loadExpenses();
           })
           .catch(err => alert("Error deleting expense: " + err.message));
@@ -624,7 +624,7 @@ async function handleGalleryImages(input) {
   const totalFiles = files.length;
 
   // Show progress
-  alert(`${totalFiles} फाइलें अपलोड हो रही हैं... कृपया प्रतीक्षा करें।`);
+ 
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
@@ -668,7 +668,7 @@ async function handleGalleryImages(input) {
 
   // Show results
   if (successCount > 0 && errors.length === 0) {
-    alert(`सभी ${successCount} फोटो सफलतापूर्वक अपलोड हुईं!`);
+    
   } else if (successCount > 0) {
     alert(`${successCount}/${totalFiles} फोटो अपलोड हुईं।\n\nअसफल:\n${errors.join('\n')}`);
   } else {
@@ -881,12 +881,9 @@ if (document.readyState === 'loading') {
 
 // Your other functions...
 function handleMemberPhoto(input) {
-    alert("inside handle");
+   
     memberPhotoFile = input.files[0] || null;
-    if(memberPhotoFile) 
-        alert('Selected photo: ' + memberPhotoFile.name);
-    else 
-        alert('No photo selected');
+    
 }
 
 function addMember() {
@@ -1088,7 +1085,7 @@ const CLOUDINARY_UPLOAD_PRESET = "Ganpati2025"; // Replace <upload_preset>
 
 // Universal Cloudinary upload function
 function uploadToCloudinary(file, callback) {
-  alert('inside upload cloudanary');
+  
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
