@@ -614,7 +614,7 @@ async function handleGalleryImages(input) {
       
       // Upload to Cloudinary
       //const uploadResult = await uploadToCloudinary(file);
-       uploadToCloudinary(file, (url, fname, fsize) => {
+    uploadToCloudinary(file, (url, fname, fsize) => {
     if (url) {
        try {
         // Save to Firestore after successful upload
@@ -638,6 +638,7 @@ async function handleGalleryImages(input) {
     } else {
       console.error('Upload failed');
       alert("फ़ाइल अपलोड में त्रुटि!");
+    }
     }
           });
     
