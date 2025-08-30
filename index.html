@@ -614,34 +614,31 @@ async function handleGalleryImages(input) {
       
       // Upload to Cloudinary
       //const uploadResult = await uploadToCloudinary(file);
-    uploadToCloudinary(file, (url, fname, fsize) => {
-    if (url) {
-       try {
-        // Save to Firestore after successful upload
-        await db.collection("gallery").add({
-          url: url,                    // Cloudinary URL
-          name: filename || file.name, // Use Cloudinary filename or fallback to original
-          type: file.type,
-          size: size || file.size,     // Use Cloudinary size or fallback to original
-          date: new Date().toLocaleDateString('hi-IN'),
-          uploadDate: new Date(),
-          publicId: publicId || null
-        });
-        
-        console.log('Upload and save successful');
-        alert('फ़ाइल सफलतापूर्वक अपलोड हुई!');
-        
-      } catch (dbError) {
-        console.error('Database save failed:', dbError);
-        alert("डेटाबेस में सेव करने में त्रुटि!");
-      }
-    } else {
-      console.error('Upload failed');
-      alert("फ़ाइल अपलोड में त्रुटि!");
+   uploadToCloudinary(file, async (url, fname, fsize) => {           // Add "async" here
+  if (url) {
+    try {
+      // Save to Firestore after successful upload
+      await db.collection("gallery").add({
+        url: url,                    // Cloudinary URL
+        name: filename || file.name, // Use Cloudinary filename or fallback to original
+        type: file.type,
+        size: size || file.size,     // Use Cloudinary size or fallback to original
+        date: new Date().toLocaleDateString('hi-IN'),
+        uploadDate: new Date(),
+        publicId: publicId || null
+      });
+
+      console.log('Upload and save successful');
+      alert('फ़ाइल सफलतापूर्वक अपलोड हुई!');
+    } catch (dbError) {
+      console.error('Database save failed:', dbError);
+      alert("डेटाबेस में सेव करने में त्रुटि!");
     }
-    }
-          });
-    
+  } else {
+    console.error('Upload failed');
+    alert("फ़ाइल अपलोड में त्रुटि!");
+  }
+}); 
       successCount++;
       console.log(`Successfully uploaded: ${file.name}`);
       
