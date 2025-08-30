@@ -624,8 +624,7 @@ async function handleGalleryImages(input) {
         type: file.type,
         size: file.size,     // Use Cloudinary size or fallback to original
         date: new Date().toLocaleDateString('hi-IN'),
-        uploadDate: new Date(),
-        publicId: publicId || null
+        uploadDate: new Date()
       });
 
       console.log('Upload and save successful');
