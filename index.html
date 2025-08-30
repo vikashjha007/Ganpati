@@ -390,15 +390,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Donations
   document.querySelectorAll('#add-donation').forEach(el => el.style.display = displayStyle);
-  document.querySelectorAll('.btn-delete-donation').forEach(el => el.style.display = displayStyle);
+  document.querySelectorAll('#btn-delete-donation').forEach(el => el.style.display = displayStyle);
 
   // Members
   document.querySelectorAll('#add-member').forEach(el => el.style.display = displayStyle);
-  document.querySelectorAll('.btn-delete-member').forEach(el => el.style.display = displayStyle);
+  document.querySelectorAll('#btn-delete-member').forEach(el => el.style.display = displayStyle);
 
   // Expenses
   document.querySelectorAll('#add-expense').forEach(el => el.style.display = displayStyle);
-  document.querySelectorAll('.btn-delete-expense').forEach(el => el.style.display = displayStyle);
+  document.querySelectorAll('#btn-delete-expense').forEach(el => el.style.display = displayStyle);
 
   // Upload Images
   document.querySelectorAll('.btn-upload-image').forEach(el => el.style.display = displayStyle);
@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <td>${donation.name}</td>
         <td><span class="badge ${donation.paymentMode === 'cash' ? 'badge-success' : 'badge-info'}">${donation.paymentMode.toUpperCase()}</span></td>
         <td><strong>₹${donation.amount.toLocaleString()}</strong></td>
-        <td><button class="btn btn-danger btn-delete-donation" style="padding:0.25rem 0.5rem;" onclick="deleteDonation('${donation.id}')"><i class="fas fa-trash"></i></button></td>
+        <td><button class="btn btn-danger btn-delete-donation" id="btn-delete-donation" style="padding:0.25rem 0.5rem;" onclick="deleteDonation('${donation.id}')"><i class="fas fa-trash"></i></button></td>
       </tr>
     `).join('');
     document.querySelector('#totalDonations .amount').textContent = `₹${totalAmount.toLocaleString()}`;
@@ -571,7 +571,7 @@ function renderExpenses(expenses) {
       <div style="min-width: 80px; font-weight: 700; color: #059669; font-size: 1.2rem; text-align: right;">
         ₹${(expense.amount || 0).toLocaleString()}
       </div>
-      <button 
+      <button id="btn-delete-expense"
         onclick="deleteExpense('${expense.id}')" 
         style="background: #ef4444; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 8px; cursor: pointer; flex-shrink: 0;">
         Delete
@@ -978,7 +978,7 @@ function renderMembers(members) {
 
   membersGrid.innerHTML = members.map(member => `
     <div class="member-card">
-      <button class="delete-btn btn-delete-member" onclick="deleteMember('${member.id}')">
+      <button class="delete-btn btn-delete-member" id ="btn-delete-member" onclick="deleteMember('${member.id}')">
         <i class="fas fa-times"></i>
       </button>
       
