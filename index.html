@@ -581,44 +581,6 @@ function renderExpenses(expenses) {
 let galleryImages = [];
 
 // Universal Cloudinary upload function (updated to work with both patterns)
-async function uploadToCloudinary(file, callback = null) {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-alert('inside upload');
-  try {
-    const response = await fetch(CLOUDINARY_URL, {
-      method: "POST",
-      body: formData
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    if (!data.secure_url) {
-      throw new Error("Upload failed - no URL returned");
-    }
-    
-    // If callback provided, use callback pattern (for expenses/members)
-    if (callback) {
-      callback(data.secure_url, data.original_filename || file.name, data.bytes || file.size);
-      return;
-    }
-    
-    // Otherwise return data (for gallery)
-    return data;
-  } catch (error) {
-    console.error('Cloudinary upload error:', error);
-    if (callback) {
-      callback(null, null, null);
-    } else {
-      throw error;
-    }
-  }
-}
 
 // Handle gallery image uploads
 async function handleGalleryImages(input) {
@@ -652,9 +614,9 @@ async function handleGalleryImages(input) {
       
       // Upload to Cloudinary
       const uploadResult = await uploadToCloudinary(file);
-      alert(`inside... कृपया प्रतीक्षा करें।`);
-      // Save to Firestore
-      await db.collection("gallery").add({
+uploadToCloudinary(file, (url, fname, fsize) => {
+            if (url) {
+               db.collection("gallery").add({
         url: uploadResult.secure_url,
         name: file.name,
         type: file.type,
@@ -663,6 +625,13 @@ async function handleGalleryImages(input) {
         uploadDate: new Date(),
         publicId: uploadResult.public_id || null
       });
+            } else {
+                alert("फ़ोटो अपलोड में त्रुटि!");
+            }
+        });
+      alert(`inside... कृपया प्रतीक्षा करें।`);
+      // Save to Firestore
+      //await 
       
       successCount++;
       console.log(`Successfully uploaded: ${file.name}`);
