@@ -652,7 +652,7 @@ async function handleGalleryImages(input) {
       
       // Upload to Cloudinary
       const uploadResult = await uploadToCloudinary(file);
-      
+      alert(`inside... कृपया प्रतीक्षा करें।`);
       // Save to Firestore
       await db.collection("gallery").add({
         url: uploadResult.secure_url,
