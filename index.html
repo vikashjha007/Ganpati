@@ -620,9 +620,9 @@ async function handleGalleryImages(input) {
       // Save to Firestore after successful upload
       await db.collection("gallery").add({
         url: url,                    // Cloudinary URL
-        name: filename || file.name, // Use Cloudinary filename or fallback to original
+        name:  file.name, // Use Cloudinary filename or fallback to original
         type: file.type,
-        size: size || file.size,     // Use Cloudinary size or fallback to original
+        size: file.size,     // Use Cloudinary size or fallback to original
         date: new Date().toLocaleDateString('hi-IN'),
         uploadDate: new Date(),
         publicId: publicId || null
