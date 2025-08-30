@@ -1095,6 +1095,7 @@ const CLOUDINARY_UPLOAD_PRESET = "Ganpati2025"; // Replace <upload_preset>
 
 // Universal Cloudinary upload function
 function uploadToCloudinary(file, callback) {
+  alert('inside upload cloudanary');
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
