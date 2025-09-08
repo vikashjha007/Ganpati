@@ -196,9 +196,9 @@
                             <tr>
                                 <th>Room No.</th>
                                 <th>Name</th>
-                                <th>Payment Mode</th>
+                                
                                 <th>Amount (₹)</th>
-                                <th>Actions</th>
+                                
                             </tr>
                         </thead>
                         <tbody id="donationsTable"></tbody>
@@ -439,9 +439,9 @@ document.addEventListener('DOMContentLoaded', function() {
       <tr>
         <td>${donation.roomNumber}</td>
         <td>${donation.name}</td>
-        <td><span class="badge ${donation.paymentMode === 'cash' ? 'badge-success' : 'badge-info'}">${donation.paymentMode.toUpperCase()}</span></td>
+       
         <td><strong>₹${donation.amount.toLocaleString()}</strong></td>
-        <td><button class="btn btn-danger" id="btn-delete-donation" style="padding:0.25rem 0.5rem; display:none;" onclick="deleteDonation('${donation.id}')"><i class="fas fa-trash"></i></button></td>
+        
       </tr>
     `).join('');
     document.querySelector('#totalDonations .amount').textContent = `₹${totalAmount.toLocaleString()}`;
