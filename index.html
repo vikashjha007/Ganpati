@@ -512,7 +512,7 @@ function clearExpenseForm() {
 
 // Load all expenses from Firestore
 function loadExpenses() {
-  db.collection("expenses").get()
+  db.collection("expenses").orderBy("amount", "desc").get()
     .then(querySnapshot => {
       const expenses = [];
       querySnapshot.forEach(doc => {
