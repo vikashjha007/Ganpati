@@ -426,7 +426,8 @@ document.addEventListener('DOMContentLoaded', function() {
     db.collection("donations").get().then(q => {
       donations = [];
       q.forEach(doc => { let d = doc.data(); d.id = doc.id; donations.push(d); });
-      renderDonations();
+      donations.sort((a, b) => parseInt(a.roomNumber) - parseInt(b.roomNumber));
+    renderDonations();
     });
   }
   function deleteDonation(id) {
